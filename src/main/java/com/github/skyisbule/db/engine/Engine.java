@@ -9,6 +9,8 @@ import com.github.skyisbule.db.enty.Table;
 import com.github.skyisbule.db.io.IOCenter;
 import com.github.skyisbule.db.util.ByteUtil;
 
+import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 public class Engine {
@@ -16,9 +18,6 @@ public class Engine {
     //todo 这里未来改成从 instance center获取
     private IOCenter ioCenter = new IOCenter();
 
-    public List<String> doSelect(){
-        return null;
-    }
 
     public boolean doInsert(String dbName,String tableName,List<String> columns){
         Db    db    = ConfigCenter.getDbByName(dbName);
@@ -78,6 +77,51 @@ public class Engine {
         }
         return ioCenter.writePage(dbName,tableName,page);
     }
+
+    public LinkedList<ArrayList<String>> doReadPage(String dbName,String tableName,int pageNum){
+        Db    db    = ConfigCenter.getDbByName(dbName);
+        Table table = db.getTableByName(tableName);
+
+        Page   page = ioCenter.getPage(dbName,tableName,pageNum);
+        byte[] data = page.getData();
+        LinkedList<ArrayList<String>> result = new LinkedList<>();
+        int begin = 16;
+        do {
+            ArrayList<String> recordTemp = new ArrayList<>();
+            for (ColumnTypeEnum type : table.getTypes()) {
+                switch (type) {
+                    case TIME:
+                    case INT:
+                        byte[] tempInt = ByteUtil.cut(data, begin, 4);
+                        int num = ByteUtil.byte2int(tempInt);
+                        recordTemp.add(String.valueOf(num));
+                        begin += 4;
+                        break;
+                    case STRING:
+                        //这个字段有可能是空的
+                        if (data[begin] == DefaultConfig.DATA_NULL_FLAG) {
+                            recordTemp.add("");
+                            break;
+                        }
+                        int end = 0;
+                        for (int i = begin; i < data.length; i++) {
+                            if (data[i] == DefaultConfig.COLUMN_END_FLAG) {
+                                end = i;
+                                break;
+                            }
+                        }
+                        byte[] strTemp = ByteUtil.cut(data, begin, end - begin);
+                        recordTemp.add(new String(strTemp));
+                        begin = end + 1;
+                }
+            }
+            result.add(recordTemp);
+            begin += 4;
+        } while (begin < page.getPageEndPos());
+        return result;
+    }
+
+
 
     private byte[] getEmptyPage(int pageId,int indexId,byte[] data){
         byte[] pageIdBytes = ByteUtil.int2byte(pageId);
