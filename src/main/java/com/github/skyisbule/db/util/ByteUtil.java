@@ -27,19 +27,20 @@ public class ByteUtil {
         return target;
     }
 
-    public static byte[] int2byte(int integer){
-        byte[] bytes = new byte[4];
-        for (int i = 0; i < 4; i++) {
-            bytes[i] = (byte)(integer >>> (i * 8));
-        }
-        return bytes;
+    public static byte[] int2byte(int sum){
+        byte[] arr = new byte[4];
+        arr[0] = (byte) (sum >> 24);
+        arr[1] = (byte) (sum >> 16);
+        arr[2] = (byte) (sum >> 8);
+        arr[3] = (byte) (sum & 0xff);
+        return arr;
     }
 
     public static int byte2int(byte[] bytes){
-        return  (bytes[0]<<24)&0xff000000|
-                (bytes[1]<<16)&0x00ff0000|
-                (bytes[2]<< 8)&0x0000ff00|
-                (bytes[3])&0x000000ff;
+        return   bytes[3] & 0xFF |
+                (bytes[2] & 0xFF) << 8 |
+                (bytes[1] & 0xFF) << 16 |
+                (bytes[0] & 0xFF) << 24;
     }
 
     public static byte[] getColumnEnd(){

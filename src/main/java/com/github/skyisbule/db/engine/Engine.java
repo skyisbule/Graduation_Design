@@ -61,9 +61,11 @@ public class Engine {
         byte[] source  = page.data;
         int pageEndPos = page.getPageEndPos();
         if (pageEndPos + len < (1024*16 - 16 - 1)){ //代表此时不需要分页,直接在页末添加数据
-            int newMaxPos        = pageEndPos + len;               //0
+            int    newMaxPos     = pageEndPos + len;               //0
             byte[] endPosHeader  = ByteUtil.int2byte(newMaxPos);  //1
-            source = ByteUtil.write(source,endPosHeader,12); //2 这3行更新header头信息
+            int    newRecordId   = page.maxId + 1;
+            source = ByteUtil.write(source,ByteUtil.int2byte(newRecordId),8);
+            source = ByteUtil.write(source,endPosHeader,12); //2 这3行更新header头信息 maxPos 和 maxId
             page.setData(ByteUtil.write(source,data,pageEndPos));//数据写入source
         }else{
             Page newPage = new Page();
@@ -74,8 +76,7 @@ public class Engine {
             byte[] newData = getEmptyPage(page.pageNum+1,page.minId+1,data);
             newPage.setData(newData);
         }
-        ioCenter.writePage(dbName,tableName,page);
-        return true;
+        return ioCenter.writePage(dbName,tableName,page);
     }
 
     private byte[] getEmptyPage(int pageId,int indexId,byte[] data){
