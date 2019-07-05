@@ -12,5 +12,6 @@ public class Record {
 
     public int id;
     public List<Object> column;
+    public boolean deleted;
 
 }
