@@ -4,7 +4,7 @@ import com.github.skyisbule.db.enty.Page;
 
 public class IOCenter {
 
-    public boolean writePage(String db,int pageNum, Page page){
+    public boolean writePage(String db,String talbe, Page page){
 
         return true;
     }
