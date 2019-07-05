@@ -4,6 +4,8 @@ import com.github.skyisbule.db.common.DefaultConfig;
 import com.github.skyisbule.db.enty.Page;
 import com.github.skyisbule.db.util.ByteUtil;
 
+import java.io.File;
+import java.io.IOException;
 import java.io.RandomAccessFile;
 
 public class IOCenter {
@@ -25,6 +27,18 @@ public class IOCenter {
     public boolean appendPage(String db, Page page) {
 
         return true;
+    }
+
+    public void createEemptyTable(String db, String table) throws IOException {
+        String path = DefaultConfig.BASE_WORK_PATH + db + "_" + table + ".db";
+        File   file = new File(path);
+        if (file.exists()){
+            boolean delete = file.delete();
+        }else {
+            if (file.createNewFile()){
+                writePage(db,table,buildEmptyPage());
+            }
+        }
     }
 
     public Page buildEmptyPage(){

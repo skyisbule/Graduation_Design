@@ -1,6 +1,7 @@
 package com.github.skyisbule.db.engine;
 
 import com.github.skyisbule.db.center.ConfigCenter;
+import com.github.skyisbule.db.center.InstanceManager;
 import com.github.skyisbule.db.common.ColumnTypeEnum;
 import com.github.skyisbule.db.common.DefaultConfig;
 import com.github.skyisbule.db.enty.Db;
@@ -9,15 +10,24 @@ import com.github.skyisbule.db.enty.Table;
 import com.github.skyisbule.db.io.IOCenter;
 import com.github.skyisbule.db.util.ByteUtil;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
 public class Engine {
 
-    //todo 这里未来改成从 instance center获取
-    private IOCenter ioCenter = new IOCenter();
+    private IOCenter ioCenter = (IOCenter)InstanceManager.getInstance("IOCenter");
 
+    public boolean doCreateTable(String dbName,String tableName){
+        try {
+            ioCenter.createEemptyTable(dbName,tableName);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+        return true;
+    }
 
     public boolean doInsert(String dbName,String tableName,List<String> columns){
         Db    db    = ConfigCenter.getDbByName(dbName);
