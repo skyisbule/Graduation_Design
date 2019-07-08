@@ -38,13 +38,15 @@ public class SelectTest {
         table.setTypes(types);
         table.setColumnNames(names);
 
-        ConfigCenter.dbInfo.put("db_test",db);
+       //ConfigCenter.dbInfo.put("db_test",db);
 
 
 
         Engine engine = new Engine();
         AtomicInteger integer = new AtomicInteger(1);
-        LinkedList<ArrayList<String>> res = engine.doReadPage("db_test","user",2);
+        long begin = System.currentTimeMillis();
+        LinkedList<ArrayList<String>> res = engine.doReadPage("db_test","user",3);
+        System.out.println("used:"+(System.currentTimeMillis() - begin));
         res.forEach(list->{
             System.out.println("key:"+list.get(0)+" val:"+list.get(1) + " id:" + integer);
             integer.addAndGet(1);

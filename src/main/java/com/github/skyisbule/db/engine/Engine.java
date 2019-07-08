@@ -86,6 +86,9 @@ public class Engine {
             newPage.setData(newData);
             page = newPage;
         }
+        //更新记录
+        table.setRecordNum(table.getRecordNum() + 1 );
+        ConfigCenter.flushConfig(dbName);
         return ioCenter.writePage(dbName,tableName,page);
     }
 

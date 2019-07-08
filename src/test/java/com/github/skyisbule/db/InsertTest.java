@@ -36,7 +36,7 @@ public class InsertTest {
         table.setTypes(types);
         table.setColumnNames(names);
 
-        ConfigCenter.dbInfo.put("db_test",db);
+       // ConfigCenter.dbInfo.put("db_test",db);
 
         Random random = new Random();
 
