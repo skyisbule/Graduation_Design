@@ -21,7 +21,7 @@ public class Engine {
 
     public boolean doCreateTable(String dbName,String tableName){
         try {
-            ioCenter.createEemptyTable(dbName,tableName);
+            ioCenter.createEmptyTable(dbName,tableName);
         } catch (IOException e) {
             e.printStackTrace();
             return false;
@@ -84,6 +84,7 @@ public class Engine {
             newPage.setPageEndPos(16 + len);
             byte[] newData = getEmptyPage(page.pageNum+1,page.minId+1,data);
             newPage.setData(newData);
+            page = newPage;
         }
         return ioCenter.writePage(dbName,tableName,page);
     }
@@ -146,6 +147,7 @@ public class Engine {
         byte[] result = new byte[0];
         result = ByteUtil.byteMerger(result,header);
         result = ByteUtil.byteMerger(result,data);
+        result = ByteUtil.byteMerger(result,new byte[1024 * 16 - result.length]);
         return result;
     }
 

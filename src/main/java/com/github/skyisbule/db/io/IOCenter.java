@@ -15,7 +15,8 @@ public class IOCenter {
         try{
             RandomAccessFile file = new RandomAccessFile(path, "rws");
             int size = 16*1024;
-            file.write(page.getData(),(page.getPageNum()-1)*size,size);
+            file.seek((long)(page.getPageNum()-1)*size);
+            file.write(page.getData());
             file.close();
             return true;
         }catch (Exception e){
@@ -24,12 +25,7 @@ public class IOCenter {
         return false;
     }
 
-    public boolean appendPage(String db, Page page) {
-
-        return true;
-    }
-
-    public void createEemptyTable(String db, String table) throws IOException {
+    public void createEmptyTable(String db, String table) throws IOException {
         String path = DefaultConfig.BASE_WORK_PATH + db + "_" + table + ".db";
         File   file = new File(path);
         if (file.exists()){
@@ -57,12 +53,14 @@ public class IOCenter {
 
     public Page getPage(String db, String table, int pageNum) {
         String path = DefaultConfig.BASE_WORK_PATH + db + "_" + table + ".db";
-        Page page = buildEmptyPage();
+        Page page = null;
         try{
             RandomAccessFile file = new RandomAccessFile(path, "r");
             int size = 16*1024;
+            if (file.length() < 1) return buildEmptyPage();
             byte[] data = new byte[size];
-            file.read(data,(pageNum-1)*size,size);
+            file.seek((pageNum-1)*size);
+            file.read(data);
             file.close();
             int minId      = ByteUtil.byte2int(ByteUtil.cut(data,4,4));
             int maxId      = ByteUtil.byte2int(ByteUtil.cut(data,8,4));
