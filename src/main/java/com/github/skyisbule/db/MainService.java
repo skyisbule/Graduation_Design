@@ -8,7 +8,6 @@ import com.github.skyisbule.db.enty.Db;
 import com.github.skyisbule.db.enty.Table;
 import com.github.skyisbule.db.filter.Filter;
 import com.github.skyisbule.db.filter.FilterChain;
-import com.github.skyisbule.db.filter.FilterEnum;
 import com.github.skyisbule.db.io.IOCenter;
 
 import java.io.IOException;
@@ -92,18 +91,24 @@ public class MainService {
                 ArrayList<String> record = source.get(k);
                 for (int column = 0; column < record.size(); column++) {
                     Filter filter = filterChain.getFilters().get(column);
+                    String str = record.get(column);
                     if (filter.isDoFilter())
                     switch (filter.getType()){
                         case EQUALS:
-                            String str = record.get(column);
                             if (filter.getTarget().equals(str))
                                 pass.add(record);
                             break;
                         case IN:
+                            if (str.contains(filter.getTarget()))
+                                pass.add(record);
                             break;
                         case LESS:
+                            if (Integer.parseInt(str) < filter.getVal())
+                                pass.add(record);
                             break;
                         case THAN:
+                            if (Integer.parseInt(str) > filter.getVal())
+                                pass.add(record);
                             break;
                     }
                 }
