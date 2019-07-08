@@ -6,6 +6,9 @@ import com.github.skyisbule.db.common.ColumnTypeEnum;
 import com.github.skyisbule.db.engine.Engine;
 import com.github.skyisbule.db.enty.Db;
 import com.github.skyisbule.db.enty.Table;
+import com.github.skyisbule.db.filter.Filter;
+import com.github.skyisbule.db.filter.FilterChain;
+import com.github.skyisbule.db.filter.FilterEnum;
 import com.github.skyisbule.db.io.IOCenter;
 
 import java.io.IOException;
@@ -73,6 +76,40 @@ public class MainService {
         for (int i = 1; i <= pages; i++) {
             LinkedList<ArrayList<String>> temp = engine.doReadPage(dbName,tableName,i);
             result.addAll(temp);
+        }
+        return result;
+    }
+
+    LinkedList<ArrayList<String>> doSelect(String dbName, String tableName, FilterChain filterChain){
+        Db db = ConfigCenter.getDbByName(dbName);
+        int pages = db.getTableByName(tableName).pageNum;
+        LinkedList<ArrayList<String>> result = new LinkedList<>();
+        for (int i = 1; i <= pages; i++) {
+            LinkedList<ArrayList<String>> source = engine.doReadPage(dbName,tableName,i);
+            LinkedList<ArrayList<String>> pass   = new LinkedList<>();
+            for (int k = 0; k < source.size(); k++) {
+
+                ArrayList<String> record = source.get(k);
+                for (int column = 0; column < record.size(); column++) {
+                    Filter filter = filterChain.getFilters().get(column);
+                    if (filter.isDoFilter())
+                    switch (filter.getType()){
+                        case EQUALS:
+                            String str = record.get(column);
+                            if (filter.getTarget().equals(str))
+                                pass.add(record);
+                            break;
+                        case IN:
+                            break;
+                        case LESS:
+                            break;
+                        case THAN:
+                            break;
+                    }
+                }
+
+            }
+            result.addAll(pass);
         }
         return result;
     }
