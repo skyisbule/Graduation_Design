@@ -9,6 +9,8 @@ import com.github.skyisbule.db.enty.Table;
 import com.github.skyisbule.db.io.IOCenter;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 //启动主类
@@ -16,11 +18,11 @@ public class MainService {
 
     private Engine engine = new Engine();
 
-    public MainService(){
+    MainService(){
         init();
     }
 
-    public void init(){
+    void init(){
         try {
             InstanceManager.addInstance("IOCenter",new IOCenter());
             ConfigCenter.getFromDisk();
@@ -31,7 +33,7 @@ public class MainService {
 
     }
 
-    public void createDb(String dbName){
+    void createDb(String dbName){
         try {
             ConfigCenter.createDB(dbName);
         }catch (Exception e){
@@ -40,7 +42,7 @@ public class MainService {
         }
     }
 
-    public void createTable(String dbName, String tableName, List<String> names, List<ColumnTypeEnum> types) throws IOException {
+    void createTable(String dbName, String tableName, List<String> names, List<ColumnTypeEnum> types) throws IOException {
         engine.doCreateTable(dbName,tableName);
         Db db = new Db();
         db.setDbName(dbName);
@@ -55,7 +57,7 @@ public class MainService {
         ConfigCenter.createTable(dbName,table);
     }
 
-    public void doInsert(String dbName,String tableName,List<String> columns){
+    void doInsert(String dbName,String tableName,List<String> columns){
         Db    db    = ConfigCenter.getDbByName(dbName);
         Table table = db.getTableByName(tableName);
         int pageNum = table.getPageNum();
@@ -63,8 +65,16 @@ public class MainService {
         engine.doInsert(dbName,tableName,columns,pageNum);
     }
 
-    public void doSelect(){
-
+    LinkedList<ArrayList<String>> doSelect(String dbName,String tableName){
+        //这里写成select *   之后再补充filter
+        Db db = ConfigCenter.getDbByName(dbName);
+        int pages = db.getTableByName(tableName).pageNum;
+        LinkedList<ArrayList<String>> result = new LinkedList<>();
+        for (int i = 1; i <= pages; i++) {
+            LinkedList<ArrayList<String>> temp = engine.doReadPage(dbName,tableName,i);
+            result.addAll(temp);
+        }
+        return result;
     }
 
     public static void main(String args[]){

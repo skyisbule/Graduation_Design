@@ -6,6 +6,7 @@ import com.github.skyisbule.db.io.IOCenter;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.LinkedList;
 
 public class DbCreateTest {
 
@@ -15,8 +16,9 @@ public class DbCreateTest {
 
         MainService service = new MainService();
         service.init();
-        service.createDb("test");
 
+        //建库
+        service.createDb("test");
         //建表
         ArrayList<String> names = new ArrayList<>();
         names.add("name");
@@ -29,6 +31,24 @@ public class DbCreateTest {
         types.add(ColumnTypeEnum.INT);
 
         service.createTable("test","user",names,types);
+
+        for (int i = 0; i < 10; i++) {
+            ArrayList<String> record = new ArrayList<>();
+            record.add("skyisbule");
+            record.add("man");
+            record.add(String.valueOf(i));
+            service.doInsert("test","user",record);
+        }
+
+        LinkedList<ArrayList<String>> data = service.doSelect("test","user");
+
+        data.forEach(list->{
+            list.forEach(v->{
+                System.out.print(v+" ");
+            });
+            System.out.println();
+        });
+
     }
 
 }
