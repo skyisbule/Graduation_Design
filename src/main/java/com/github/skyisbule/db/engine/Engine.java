@@ -29,10 +29,9 @@ public class Engine {
         return true;
     }
 
-    public boolean doInsert(String dbName,String tableName,List<String> columns){
+    public boolean doInsert(String dbName,String tableName,List<String> columns,int pageNum){
         Db    db    = ConfigCenter.getDbByName(dbName);
         Table table = db.getTableByName(tableName);
-        int pageNum = table.getPageNum();
 
         Page page   = ioCenter.getPage(dbName,tableName,pageNum);
         List<ColumnTypeEnum> types = table.getTypes();
@@ -77,6 +76,7 @@ public class Engine {
             source = ByteUtil.write(source,endPosHeader,12); //2 这3行更新header头信息 maxPos 和 maxId
             page.setData(ByteUtil.write(source,data,pageEndPos));//数据写入source
         }else{
+            table.setPageNum(pageNum + 1);//更新一下页号
             Page newPage = new Page();
             newPage.setPageNum(page.getPageNum() + 1);
             newPage.setMinId(page.maxId + 1);

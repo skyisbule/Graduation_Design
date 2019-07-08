@@ -11,7 +11,7 @@ import com.github.skyisbule.db.io.IOCenter;
 import java.util.List;
 
 //启动主类
-public class Main {
+public class MainService {
 
     Engine engine = new Engine();
 
@@ -33,7 +33,12 @@ public class Main {
     }
 
     public void doInsert(String dbName,String tableName,List<String> columns){
-        engine.doInsert(dbName,tableName,columns);
+        Db    db    = ConfigCenter.getDbByName(dbName);
+        Table table = db.getTableByName(tableName);
+        int pageNum = table.getPageNum();
+
+
+        engine.doInsert(dbName,tableName,columns,pageNum);
     }
 
     public void doSelect(){
