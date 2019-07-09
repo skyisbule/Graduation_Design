@@ -5,7 +5,9 @@ public enum FilterEnum {
     EQUALS,
     THAN,
     LESS,
-    IN
+    IN,
+    COUNT,
+    GROUP
 
 
     ,NOTHING
