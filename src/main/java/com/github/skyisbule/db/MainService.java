@@ -67,6 +67,14 @@ public class MainService {
         engine.doInsert(dbName,tableName,columns,pageNum);
     }
 
+    void batchInsert(String dbName, String tableName, LinkedList<List<String>> records){
+        Db    db    = ConfigCenter.getDbByName(dbName);
+        Table table = db.getTableByName(tableName);
+        int pageNum = table.getPageNum();
+
+        engine.batchInsert(dbName,tableName,records,pageNum);
+    }
+
     LinkedList<ArrayList<String>> doSelect(String dbName,String tableName){
         //这里写成select *   之后再补充filter
         Db db = ConfigCenter.getDbByName(dbName);

@@ -55,4 +55,12 @@ public class ByteUtil {
         return bytes;
     }
 
+    public static byte[] updateMaxId(byte[] data,int target){
+        return write(data,ByteUtil.int2byte(target),8);
+    }
+
+    public static byte[] updateEndPos(byte[] data,int target){
+        return write(data,ByteUtil.int2byte(target),12);
+    }
+
 }

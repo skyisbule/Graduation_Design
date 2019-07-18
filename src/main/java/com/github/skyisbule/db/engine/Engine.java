@@ -29,12 +29,64 @@ public class Engine {
         return true;
     }
 
-    public boolean doInsert(String dbName,String tableName,List<String> columns,int pageNum){
+    /**
+     * 批量插入的思想就是一次性写满一个page，写满page后再进行io
+     */
+    public boolean batchInsert(String dbName, String tableName, LinkedList<List<String>> records, int pageNum){
         Db    db    = ConfigCenter.getDbByName(dbName);
         Table table = db.getTableByName(tableName);
 
-        Page page   = ioCenter.getPage(dbName,tableName,pageNum);
         List<ColumnTypeEnum> types = table.getTypes();
+        Page page        = ioCenter.getPage(dbName,tableName,pageNum);
+        byte[] pageBytes = page.getData();
+        int pageEndPos   = page.getPageEndPos();
+
+        table.setRecordNum(table.getRecordNum() + records.size());
+        for (List<String> columns : records) {
+
+            byte[] data = record2bytes(columns,types);
+            //代表没写满  那就不io接着往后写
+            if (pageEndPos + data.length < 1024*16){
+                pageBytes = ByteUtil.write(pageBytes,data,pageEndPos);
+                pageEndPos += data.length;
+                page.increaseMaxId();
+                page.setData(pageBytes);
+            }else{
+                //写满了  那就更新信息写入io
+                pageBytes = ByteUtil.updateMaxId(pageBytes,page.getMaxId());
+                pageBytes = ByteUtil.updateEndPos(pageBytes,pageEndPos);
+                page.setPageEndPos(pageEndPos);
+                page.setData(pageBytes);
+                ConfigCenter.flushConfig(dbName);
+                ioCenter.writePage(dbName,tableName,page);
+
+                table.setPageNum(table.getPageNum() + 1);//更新一下页号
+                Page newPage = new Page();
+                newPage.setPageNum(table.getPageNum());
+                newPage.setMinId(page.maxId + 1);
+                newPage.setMaxId(page.maxId + 1);
+                newPage.setPageEndPos(16 + data.length);
+                byte[] newData = getEmptyPage(page.pageNum+1,page.minId+1,data);
+                pageEndPos = newPage.getPageEndPos();
+                pageBytes = newData;
+                newPage.setData(newData);
+                page = newPage;
+                ioCenter.writePage(dbName,tableName,page);
+            }
+
+        }
+
+        pageBytes = ByteUtil.updateMaxId(pageBytes,page.getMaxId());
+        pageBytes = ByteUtil.updateEndPos(pageBytes,pageEndPos);
+        page.setData(pageBytes);
+
+        ConfigCenter.flushConfig(dbName);
+        ioCenter.writePage(dbName,tableName,page);
+
+        return true;
+    }
+
+    private byte[] record2bytes(List<String> columns,List<ColumnTypeEnum> types){
         //开始构建字节序列
         byte[] data = new byte[0];
         for (int i = 0; i < types.size(); i++) {
@@ -63,12 +115,25 @@ public class Engine {
         }
         //拼接一下这条数据有没有被删除
         data    = ByteUtil.byteMerger(data,ByteUtil.int2byte(DefaultConfig.ALIVE_FLAG));
+        return data;
+    }
+
+    public boolean doInsert(String dbName,String tableName,List<String> columns,int pageNum){
+        Db    db    = ConfigCenter.getDbByName(dbName);
+        Table table = db.getTableByName(tableName);
+
+        Page page   = ioCenter.getPage(dbName,tableName,pageNum);
+        List<ColumnTypeEnum> types = table.getTypes();
+        //开始构建字节序列
+        byte[] data = null;
+        data = record2bytes(columns,types);
+        //接下来要把数据写入page数组
         int len = data.length;
         //构建完成  此时data  已经为记录数据+换行符的格式了
         //接下来要判断当前页表能否有足够空间供我们插入数据  如果没有的话需要新建页表
         byte[] source  = page.data;
         int pageEndPos = page.getPageEndPos();
-        if (pageEndPos + len < (1024*16 - 16 - 1)){ //代表此时不需要分页,直接在页末添加数据
+        if (pageEndPos + len < (1024*16)){ //代表此时不需要分页,直接在页末添加数据
             int    newMaxPos     = pageEndPos + len;               //0
             byte[] endPosHeader  = ByteUtil.int2byte(newMaxPos);  //1
             int    newRecordId   = page.maxId + 1;

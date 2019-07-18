@@ -29,4 +29,7 @@ public class Page {
 
     public List<Record> records;
 
+    public void increaseMaxId(){
+        this.maxId++;
+    }
 }
