@@ -118,6 +118,10 @@ public class MainService {
                             if (Integer.parseInt(str) > filter.getVal())
                                 pass.add(record);
                             break;
+                        case IS:
+                            if (Integer.parseInt(str) == filter.getVal())
+                                pass.add(record);
+                            break;
                     }
                 }
 
