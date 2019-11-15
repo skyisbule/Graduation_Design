@@ -54,6 +54,9 @@ mvn test
 * Twitter: [@skyisbule](https://twitter.com/skyisbule)
 * Github: [@skyisbule](https://github.com/skyisbule)
 
+## Develop log
+目前的打算是主分支专门做存储+计算引擎，另一个分支（transaction）针对小数据场景做好锁、事务及优化。
+
 ## 🤝 Contributing
 
 Contributions, issues and feature requests are welcome!
