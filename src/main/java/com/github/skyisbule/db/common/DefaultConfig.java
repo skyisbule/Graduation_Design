@@ -9,4 +9,6 @@ public interface DefaultConfig {
 
     public static String BASE_WORK_PATH   = "/Users/hqt/Desktop/db/";
 
+    public static Integer COLUMN_MAX_LENGTH = 50;
+
 }

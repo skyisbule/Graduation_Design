@@ -3,6 +3,7 @@ package com.github.skyisbule.db;
 import com.github.skyisbule.db.center.InstanceManager;
 import com.github.skyisbule.db.common.ColumnTypeEnum;
 import com.github.skyisbule.db.io.IOCenter;
+import com.github.skyisbule.db.util.ConsoleUtil;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -41,12 +42,7 @@ public class DbCreateTest {
 
         LinkedList<ArrayList<String>> data = service.doSelect("test","user");
 
-        data.forEach(list->{
-            list.forEach(v->{
-                System.out.print(v+" ");
-            });
-            System.out.println();
-        });
+        ConsoleUtil.show(data);
 
     }
 
