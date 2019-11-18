@@ -1,0 +1,25 @@
+此项目的核心目标非常简单:让开发者可以很方便地录入数据源，并对数据源进行简单的操作，要求高效。
+
+故可以写一份示例的代码
+
+public static void main{
+
+    //这里的数据源可以是多种，也可以是自己建表后自己在代码里实现插入
+    DataSource data = SkyDB.load("/abc.sql");
+    SkyDB.create("demoDB",data);
+    //完成建库之后就可以直接根据key去永久使用它
+
+    DB db = SkyDB.get("demoDB");
+
+    int count = db.count("id")
+                .where("id = 1")
+                .query();
+
+    List<Result> res = db.select("*")
+                        .where("id > 1")
+                        .where("")
+                        .query()
+
+
+
+}

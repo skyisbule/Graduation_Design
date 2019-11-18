@@ -43,6 +43,8 @@ public class ConfigCenter {
             RandomAccessFile writer = new RandomAccessFile(file,"rw");
             writer.writeBytes(json);
             dbInfo.put(dbName,db);
+        }else{
+            System.out.println("create db file error check system settings or user");
         }
     }
 

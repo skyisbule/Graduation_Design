@@ -7,6 +7,6 @@ public interface DefaultConfig {
     public static byte ALIVE_FLAG       = 6;
     public static byte DATA_NULL_FLAG   = 0;
 
-    public static String BASE_WORK_PATH   = "/Users/hqt/Desktop/db";
+    public static String BASE_WORK_PATH   = "/Users/hqt/Desktop/db/";
 
 }

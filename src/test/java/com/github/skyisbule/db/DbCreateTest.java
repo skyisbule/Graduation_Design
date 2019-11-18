@@ -15,7 +15,6 @@ public class DbCreateTest {
         InstanceManager.addInstance("IOCenter",new IOCenter());
 
         MainService service = new MainService();
-        service.init();
 
         //建库
         service.createDb("test");

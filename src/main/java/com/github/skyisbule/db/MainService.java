@@ -131,8 +131,4 @@ public class MainService {
         return result;
     }
 
-    public static void main(String args[]){
-
-    }
-
 }
