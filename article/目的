@@ -23,3 +23,12 @@ public static void main{
 
 
 }
+
+
+
+--------------------------------
+|id|req_time|ip|url|header|body|
+
+1. 统计一段时间的网站访问次数
+2. 统计一段时间被访问次数最多的前n个url
+3. 统计访问次数前n的ip以及次数
