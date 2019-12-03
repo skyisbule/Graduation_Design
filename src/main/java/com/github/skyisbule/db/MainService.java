@@ -147,4 +147,12 @@ public class MainService {
 
     }
 
+    List<String> getDBs(){
+        return engine.getDBs();
+    }
+
+    boolean drop(String db){
+        return engine.drop(db);
+    }
+
 }

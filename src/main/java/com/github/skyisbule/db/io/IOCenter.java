@@ -7,6 +7,9 @@ import com.github.skyisbule.db.util.ByteUtil;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class IOCenter {
 
@@ -70,6 +73,29 @@ public class IOCenter {
             e.printStackTrace();
         }
         return page;
+    }
+
+    public List<String> getDBs(){
+        List<String> dbs = new ArrayList<>();
+        File folder = new File(DefaultConfig.BASE_WORK_PATH);
+        File[] files = folder.listFiles();
+        if (files != null){
+            Arrays.stream(files)
+                .filter(file -> file.getAbsolutePath().endsWith(".db"))
+                .forEach(file -> dbs.add(file.getName()));
+        }
+        return dbs;
+    }
+
+    public boolean drop(String db){
+        if (db == null){
+            return true;
+        }
+        File file = new File(db);
+        if (file.exists() && file.isFile()){
+            return file.delete();
+        }
+        return false;
     }
 
 }

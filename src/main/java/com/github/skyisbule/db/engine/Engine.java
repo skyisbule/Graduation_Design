@@ -31,6 +31,7 @@ public class Engine {
 
     /**
      * 批量插入的思想就是一次性写满一个page，写满page后再进行io
+     * todo 看未来能不能把这坨丑丑的代码优化一下
      */
     public boolean batchInsert(String dbName, String tableName, LinkedList<List<String>> records, int pageNum){
         Db    db    = ConfigCenter.getDbByName(dbName);
@@ -200,7 +201,14 @@ public class Engine {
         return result;
     }
 
+    //todo 这里考虑一下是不是可以过滤一下文件名，比如把后缀去掉 比如引入分表概念
+    public List<String> getDBs(){
+        return ioCenter.getDBs();
+    }
 
+    public boolean drop(String db){
+        return ioCenter.drop(db);
+    }
 
     private byte[] getEmptyPage(int pageId,int indexId,byte[] data){
         byte[] pageIdBytes = ByteUtil.int2byte(pageId);
