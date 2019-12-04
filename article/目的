@@ -32,3 +32,43 @@ public static void main{
 1. 统计一段时间的网站访问次数
 2. 统计一段时间被访问次数最多的前n个url
 3. 统计访问次数前n的ip以及次数
+
+2019-12-04 16:02:41 记录
+
+我们在裸奔处理数据时遇到的问题就是，如何快速把文本文件的内容转换成我们编程语言中可以直接操作的对象，如果数据量过大无法直接"无脑"遍历达到查询的效果，
+所以就需要一个框架，让我们能够方便地load数据，能够为我们提供一些内置的函数方便我们做数据处理，能够通过技术手段屏蔽掉内存难点，让使用端可以很简单地
+去遍历和组合数据而不必担心内存不够的情况，处理数据就像写一个foreach一样简单，且可选择框架汇总数据，也可以自己去汇总数据。
+
+//由于底层返回的都是List<List<String>> 所以在上层聚合处理时面对不同的处理流程需要使用不同的类型进行封装。
+
+data.group("column")
+    .count()
+    .top(10)
+    .show();
+
+/**
+ *  id name age => List<Record>  => List<List<String>>
+**/
+
+(User user)->{
+    List<String>|DB
+}
+
+data.group("column")
+    .sum("column")
+    .avl("column")
+    .begin(pageNum)
+    .filter(()->{})
+    .func(new DealFunc(){
+        deal(computeContext context,Record dbRecord,Record target){
+            String name = record.get("name");
+
+        }
+    })//return a dataFrame
+    .orderBy("")
+    .save()
+    .show();
+
+data.map((computeContext context,Record record)->{
+
+}).show();
