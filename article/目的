@@ -72,3 +72,25 @@ data.group("column")
 data.map((computeContext context,Record record)->{
 
 }).show();
+
+
+（）do insert data
+
+DbInstance ins = SkyDB.get("");
+
+ins.compute(()->{
+
+    preCompute()
+
+    doCompute(User user,Context context){
+        if(user.getSex.equals("man")){
+            context
+        }
+    }
+
+    afterPage(Context context){
+
+    }
+
+
+})
