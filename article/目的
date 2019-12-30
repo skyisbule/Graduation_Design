@@ -76,15 +76,28 @@ data.map((computeContext context,Record record)->{
 
 （）do insert data
 
-DbInstance ins = SkyDB.get("");
+class Paper{
+    int id;
+    string ref;
+}
+
+DbInstance<Paper> ins = SkyDB.get(Paper.class,"version");
+
+DBInstance<Paper> temp = SkyDB.buildTemp(Paper.class);
 
 ins.compute(()->{
 
-    preCompute()
+    preCompute(){}
 
-    doCompute(User user,Context context){
-        if(user.getSex.equals("man")){
-            context
+    doCompute(Paper paper,Context context){
+        if (context.getListLast().id == paper.id){
+            context.addListLast(paper);
+        }else{
+            String refs = "";
+            context.getList().foreach(p -> {
+               refs += "|"+(str)p.id;
+            })
+            temp.insert(id,refs)
         }
     }
 
@@ -94,3 +107,9 @@ ins.compute(()->{
 
 
 })
+
+ins.info()
+
+ins.find(int id);
+
+ins.byPage(new PageComputer)
