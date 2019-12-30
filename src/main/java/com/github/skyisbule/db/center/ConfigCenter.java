@@ -68,4 +68,7 @@ public class ConfigCenter {
         }
     }
 
+    public static Map<String, Db> getDbInfo() {
+        return dbInfo;
+    }
 }
