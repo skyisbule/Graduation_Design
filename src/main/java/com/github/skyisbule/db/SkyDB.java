@@ -10,6 +10,8 @@ import java.util.Map;
 import com.github.skyisbule.db.center.ConfigCenter;
 import com.github.skyisbule.db.center.InstanceManager;
 import com.github.skyisbule.db.common.ColumnTypeEnum;
+import com.github.skyisbule.db.compute.Computer;
+import com.github.skyisbule.db.context.ComputeContext;
 import com.github.skyisbule.db.data.DataObject;
 import com.github.skyisbule.db.enty.Db;
 import com.github.skyisbule.db.enty.Table;
@@ -90,9 +92,9 @@ public class SkyDB {
     public DataObject get(Class clazz, String version) {
         String dbName = clazz.getName();
         String fullName = dbName + "_" + version;
-        if (dataObjectMap.containsKey(fullName)){
+        if (dataObjectMap.containsKey(fullName)) {
             return dataObjectMap.get(fullName);
-        }else{
+        } else {
             DataObject object = new DataObject(mainService, clazz, version);
             dataObjectMap.put(fullName, object);
             return object;
@@ -119,6 +121,33 @@ public class SkyDB {
         for (Object object : objects) {
             System.out.println(((test)object).id);
         }
+
+        dataObject.doCompute(new Computer<test>() {
+            @Override
+            public void init(ComputeContext computeContext) {
+
+            }
+
+            @Override
+            public void doCompute(test o,ComputeContext context) {
+                System.out.println(o.id + "->" + o.sex);
+            }
+
+            @Override
+            public void afterOnePage() {
+
+            }
+
+            @Override
+            public void afterAll() {
+
+            }
+
+        });
+
+        dataObject.showInfo();
+
+        dataObject.showBrothers();
 
     }
 

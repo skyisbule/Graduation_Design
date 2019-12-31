@@ -10,12 +10,10 @@ public interface Computer<T> {
 
     void init(ComputeContext computeContext);
 
-    void doCompute(T t);
+    void doCompute(T t, ComputeContext context);
 
     void afterOnePage();
 
     void afterAll();
-
-    void onException();
 
 }

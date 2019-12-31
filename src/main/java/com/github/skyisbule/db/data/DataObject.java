@@ -8,10 +8,11 @@ import java.util.List;
 import com.github.skyisbule.db.MainService;
 import com.github.skyisbule.db.center.ConfigCenter;
 import com.github.skyisbule.db.common.ColumnTypeEnum;
+import com.github.skyisbule.db.compute.Computer;
+import com.github.skyisbule.db.context.ComputeContext;
 import com.github.skyisbule.db.enty.Db;
 import com.github.skyisbule.db.enty.Table;
 import com.github.skyisbule.db.util.JsonUtil;
-import com.google.gson.JsonObject;
 
 public class DataObject {
 
@@ -22,11 +23,19 @@ public class DataObject {
 
     private Class clazz;
 
+    private ComputeContext context;
+
+    private Db db;
+    private Table table;
+
     public DataObject(MainService mainService, Class clazz, String tableName) {
         this.mainService = mainService;
         this.clazz = clazz;
         this.dbName = clazz.getName();
         this.tableName = tableName;
+        db = ConfigCenter.getDbByName(dbName);
+        table = db.getTableByName(tableName);
+        context = new ComputeContext();
     }
 
     public void doInsert(Object object) {
@@ -56,14 +65,14 @@ public class DataObject {
                 Field field = clazz.getFields()[i];
                 field.setAccessible(true);
                 ColumnTypeEnum typeEnum = types.get(i);
-                switch (typeEnum){
+                switch (typeEnum) {
                     case STRING:
-                        field.set(object,record.get(i));
+                        field.set(object, record.get(i));
                         break;
                     case INT:
 
                     case TIME:
-                        field.set(object,Integer.parseInt(record.get(i)));
+                        field.set(object, Integer.parseInt(record.get(i)));
                         break;
                 }
 
@@ -71,6 +80,28 @@ public class DataObject {
             result.add(object);
         }
         return result;
+    }
+
+    public void showInfo() {
+        System.out.println(JsonUtil.getJson(ConfigCenter.getDbByName(dbName).tables.get(tableName)));
+    }
+
+    public void showBrothers(){
+        System.out.println(JsonUtil.getJson(db));
+    }
+
+    public void doCompute(Computer computer) throws InstantiationException, IllegalAccessException {
+        int pageNum = table.pageNum;
+
+        computer.init(context);
+        for (int i = 1; i <= pageNum; i++) {
+            List<Object> list = this.getPage(i);
+            for (Object obj : list) {
+                computer.doCompute(obj, context);
+            }
+            computer.afterOnePage();
+        }
+        computer.afterAll();
     }
 
 }
