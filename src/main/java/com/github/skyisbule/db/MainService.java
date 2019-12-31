@@ -68,7 +68,7 @@ public class MainService {
         engine.doInsert(dbName, tableName, columns, pageNum);
     }
 
-    void batchInsert(String dbName, String tableName, LinkedList<List<String>> records) {
+    public void batchInsert(String dbName, String tableName, LinkedList<List<String>> records) {
         Db db = ConfigCenter.getDbByName(dbName);
         Table table = db.getTableByName(tableName);
         int pageNum = table.getPageNum();

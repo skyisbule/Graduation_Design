@@ -52,6 +52,19 @@ public class DataObject {
         }
     }
 
+    public void bathInsert(List<Object> list) throws IllegalAccessException {
+        LinkedList<List<String>> records = new LinkedList<>();
+        for (Object obj : list) {
+            List<String> record = new ArrayList<>();
+            for (Field field : clazz.getFields()) {
+                field.setAccessible(true);
+                record.add(field.get(obj).toString());
+            }
+            records.add(record);
+        }
+        mainService.batchInsert(dbName,tableName,records);
+    }
+
     public List<Object> getPage(int page) throws IllegalAccessException, InstantiationException {
         List<Object> result = new LinkedList<>();
         LinkedList<ArrayList<String>> records = mainService.doSelect(dbName, tableName, page);
