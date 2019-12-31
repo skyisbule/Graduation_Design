@@ -7,6 +7,12 @@ package example.po;
  */
 public class User {
 
+    public User(Integer uid, String name, Integer age) {
+        this.uid = uid;
+        this.name = name;
+        this.age = age;
+    }
+
     public Integer uid;
     public String name;
     public Integer age;

@@ -16,7 +16,7 @@ import com.github.skyisbule.db.io.IOCenter;
 
 public class SkyDB {
 
-    public static SkyDB skyDB;
+    private static SkyDB skyDB;
 
     private static final String VERSION = "1.0.0 - snapshot";
 

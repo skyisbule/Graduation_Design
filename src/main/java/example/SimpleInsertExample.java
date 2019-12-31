@@ -22,10 +22,7 @@ public class SimpleInsertExample {
 
         //演示一下逐个插入
         for (int i = 0; i < 10; i++) {
-            User user = new User();
-            user.uid = i;
-            user.name = "sky";
-            user.age = 18 + i;
+            User user = new User(i, "sky", 18 + i);
             dataObject.doInsert(user);
         }
 
@@ -38,6 +35,8 @@ public class SimpleInsertExample {
         }
         //你也可以用内置的util来打印出漂亮的表格，更方便查看。
         ConsoleUtil.show(objects);
+        //最后再打印一下数据集的基础信息
+        dataObject.showInfo();
     }
 
 }

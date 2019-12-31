@@ -1,0 +1,38 @@
+package example;
+
+import java.util.LinkedList;
+import java.util.List;
+
+import com.github.skyisbule.db.SkyDB;
+import com.github.skyisbule.db.data.DataObject;
+import example.po.User;
+
+/**
+ * 本示例主要演示：
+ * 从内存的批量插入功能以及性能展示
+ */
+public class BathInsertExample {
+
+    public static void main(String[] args) throws IllegalAccessException {
+        //创建db实例
+        SkyDB skyDB = SkyDB.getInstance();
+        //由于 simpleInsertExample中已经创建了这个数据集 所以这里直接get即可
+        DataObject dataObject = skyDB.get(User.class, "1.0");
+
+        //准备数据
+        List<Object> data = new LinkedList<>();
+        for (int i = 0; i < 10000; i++) {
+            User user = new User(i, "sky", 18 + i);
+            data.add(user);
+        }
+        long beginTime = System.currentTimeMillis();
+        //执行批量插入
+        dataObject.bathInsert(data);
+        long endTime = System.currentTimeMillis();
+        //看一下插入所花费的时间
+        System.out.println("插入10000条数据总共花费："+(endTime-beginTime) +"ms");
+        //打印一下此时的数据集信息
+        dataObject.showInfo();
+    }
+
+}
