@@ -1,5 +1,6 @@
 package com.github.skyisbule.db.util;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -8,10 +9,10 @@ import com.github.skyisbule.db.common.DefaultConfig;
 
 public class ConsoleUtil {
 
-    public static void show(LinkedList<ArrayList<String>> data){
-        if (data == null || data.size() == 0){
+    public static void show(LinkedList<ArrayList<String>> data) {
+        if (data == null || data.size() == 0) {
             System.out.println("[ConsoleUtil - show] empty data list , nothing to show");
-            return ;
+            return;
         }
         int columnNum = data.get(0).size();
         ArrayList<Integer> lengthList = new ArrayList<>(columnNum);
@@ -20,15 +21,14 @@ public class ConsoleUtil {
         }
         for (List<String> row : data) {
             for (int i = 0; i < row.size(); i++) {
-                if ( lengthList.get(i) < row.get(i).length() )
-                    lengthList.set(i,row.get(i).length());
+                if (lengthList.get(i) < row.get(i).length()) { lengthList.set(i, row.get(i).length()); }
             }
         }
         int totalLen = 0;
         for (Integer len : lengthList) {
             totalLen += len;
         }
-        if (totalLen > columnNum * DefaultConfig.COLUMN_MAX_LENGTH){
+        if (totalLen > columnNum * DefaultConfig.COLUMN_MAX_LENGTH) {
             totalLen = columnNum * DefaultConfig.COLUMN_MAX_LENGTH;
         }
         StringBuilder line = new StringBuilder();
@@ -40,7 +40,7 @@ public class ConsoleUtil {
         int index;
         for (List<String> row : data) {
             index = 0;
-            line.delete(0,line.length());
+            line.delete(0, line.length());
             line.append('|');
             for (String column : row) {
                 int max = lengthList.get(index);
@@ -56,8 +56,32 @@ public class ConsoleUtil {
         System.out.println(outLine);
     }
 
-    public static int computeLength(String str){
+    private static int computeLength(String str) {
         return str.length();
+    }
+
+    public static void show(List<Object> list) {
+        if (list == null || list.size() == 0) {
+            return;
+        }
+        LinkedList<ArrayList<String>> param = new LinkedList<>();
+        try {
+            Object info = list.get(0);
+            Field[] fields = info.getClass().getFields();
+
+            for (Object object : list) {
+                ArrayList<String> record = new ArrayList<>();
+                for (Field field : fields) {
+                    record.add(field.get(object).toString());
+                }
+                param.add(record);
+            }
+            show(param);
+        }catch (Exception e){
+            System.err.println("[skyDB error] error for show info ,please check your param.");
+            e.printStackTrace();
+        }
+
     }
 
     public static void main(String[] args) {

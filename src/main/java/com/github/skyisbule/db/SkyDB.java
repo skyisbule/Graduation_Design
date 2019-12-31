@@ -4,14 +4,11 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import com.github.skyisbule.db.center.ConfigCenter;
 import com.github.skyisbule.db.center.InstanceManager;
 import com.github.skyisbule.db.common.ColumnTypeEnum;
-import com.github.skyisbule.db.compute.Computer;
-import com.github.skyisbule.db.context.ComputeContext;
 import com.github.skyisbule.db.data.DataObject;
 import com.github.skyisbule.db.enty.Db;
 import com.github.skyisbule.db.enty.Table;
@@ -19,7 +16,7 @@ import com.github.skyisbule.db.io.IOCenter;
 
 public class SkyDB {
 
-    private static SkyDB skyDB;
+    public static SkyDB skyDB;
 
     private static final String VERSION = "1.0.0 - snapshot";
 
@@ -99,56 +96,6 @@ public class SkyDB {
             dataObjectMap.put(fullName, object);
             return object;
         }
-    }
-
-    public static class test {
-        public Integer id;
-        public String sex;
-    }
-
-    public static void main(String[] args) throws InstantiationException, IllegalAccessException {
-        SkyDB db = getInstance();
-        DataObject dataObject = db.create(test.class, "1.0");
-        test t = new test();
-        t.id = 1;
-        t.sex = "man";
-        for (int i = 0; i < 10; i++) {
-            t.id = i;
-            dataObject.doInsert(t);
-        }
-
-        List<Object> objects = dataObject.getPage(1);
-        for (Object object : objects) {
-            System.out.println(((test)object).id);
-        }
-
-        dataObject.doCompute(new Computer<test>() {
-            @Override
-            public void init(ComputeContext computeContext) {
-
-            }
-
-            @Override
-            public void doCompute(test o,ComputeContext context) {
-                System.out.println(o.id + "->" + o.sex);
-            }
-
-            @Override
-            public void afterOnePage() {
-
-            }
-
-            @Override
-            public void afterAll() {
-
-            }
-
-        });
-
-        dataObject.showInfo();
-
-        dataObject.showBrothers();
-
     }
 
 }
