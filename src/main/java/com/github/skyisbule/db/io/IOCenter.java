@@ -36,7 +36,7 @@ public class IOCenter {
         String path = DefaultConfig.BASE_WORK_PATH + db + "_" + table + ".db";
         try {
             RandomAccessFile file = new RandomAccessFile(path, "rws");
-            int size = 16 * 1024 * pages.size();
+            int size = 16 * 1024;
             file.seek((long)(pages.get(0).getPageNum() - 1) * size);
             byte[] bytes = new byte[0];
             for (Page page : pages) {

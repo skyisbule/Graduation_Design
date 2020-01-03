@@ -7,6 +7,10 @@ package example.po;
  */
 public class User {
 
+    public User(){
+
+    }
+
     public User(Integer uid, String name, Integer age) {
         this.uid = uid;
         this.name = name;

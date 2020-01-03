@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.github.skyisbule.db.SkyDB;
 import com.github.skyisbule.db.data.DataObject;
+import com.github.skyisbule.db.util.ConsoleUtil;
 import example.po.User;
 
 /**
@@ -13,7 +14,7 @@ import example.po.User;
  */
 public class BathInsertExample {
 
-    public static void main(String[] args) throws IllegalAccessException {
+    public static void main(String[] args) throws IllegalAccessException, InstantiationException {
         //创建db实例
         SkyDB skyDB = SkyDB.getInstance();
         //由于 simpleInsertExample中已经创建了这个数据集 所以这里直接get即可
@@ -34,6 +35,12 @@ public class BathInsertExample {
         System.out.println("插入10000条数据总共花费："+(endTime-beginTime) +"ms");
         //打印一下此时的数据集信息
         dataObject.showInfo();
+
+        //获取第一个页表的数据
+        List<Object> objects = dataObject.getPage(1);
+        //你也可以用内置的util来打印出漂亮的表格，更方便查看。
+        ConsoleUtil.show(objects);
+
     }
 
 }

@@ -75,19 +75,17 @@ public class Engine {
                 pageBytes = newData;
                 newPage.setData(newData);
                 page = newPage;
-                //ioCenter.writePage(dbName,tableName,page);
-                pageList.add(page);
             }
 
         }
-        ioCenter.writePages(dbName,tableName,pageList);
 
         pageBytes = ByteUtil.updateMaxId(pageBytes,page.getMaxId());
         pageBytes = ByteUtil.updateEndPos(pageBytes,pageEndPos);
         page.setData(pageBytes);
 
+        pageList.add(page);
+        ioCenter.writePages(dbName,tableName,pageList);
         ConfigCenter.flushConfig(dbName);
-        ioCenter.writePage(dbName,tableName,page);
 
         return true;
     }
