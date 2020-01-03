@@ -28,6 +28,26 @@ public class IOCenter {
         return false;
     }
 
+    //todo 这里目前版本预计只实现连续写，即批量写页中页表号表须是连续的 等有空再实现真正的批量写 使其可以跨页表 多次io写
+    public boolean writePages(String db, String table, List<Page> pages) {
+        String path = DefaultConfig.BASE_WORK_PATH + db + "_" + table + ".db";
+        try{
+            RandomAccessFile file = new RandomAccessFile(path, "rws");
+            int size = 16*1024*pages.size();
+            file.seek((long)(pages.get(0).getPageNum()-1)*size);
+            byte[] bytes = new byte[0];
+            for (Page page : pages) {
+                bytes = ByteUtil.byteMerger(bytes,page.getData());
+            }
+            file.write(bytes);
+            file.close();
+            return true;
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return true;
+    }
+
     public void createEmptyTable(String db, String table) throws IOException {
         String path = DefaultConfig.BASE_WORK_PATH + db + "_" + table + ".db";
         File   file = new File(path);
@@ -40,7 +60,7 @@ public class IOCenter {
         }
     }
 
-    public Page buildEmptyPage(){
+    private Page buildEmptyPage(){
         byte[] pageIdBytes = ByteUtil.int2byte(1);
         byte[] pageIndexId = ByteUtil.int2byte(0);
         byte[] pageEndPos  = ByteUtil.int2byte(16);
@@ -73,6 +93,12 @@ public class IOCenter {
             e.printStackTrace();
         }
         return page;
+    }
+
+    public List<Page> getPages(String db, String table, int pageBegin, int pageEnd) {
+
+
+        return null;
     }
 
     public List<String> getDBs(){

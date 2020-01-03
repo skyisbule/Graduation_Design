@@ -17,6 +17,7 @@ public class BathInsertExample {
         //创建db实例
         SkyDB skyDB = SkyDB.getInstance();
         //由于 simpleInsertExample中已经创建了这个数据集 所以这里直接get即可
+        //如果你把数据文件删除了 或执行了drop 则在这里你需要使用create
         DataObject dataObject = skyDB.get(User.class, "1.0");
 
         //准备数据

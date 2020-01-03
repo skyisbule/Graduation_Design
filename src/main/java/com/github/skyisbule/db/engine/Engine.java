@@ -43,6 +43,8 @@ public class Engine {
         int pageEndPos   = page.getPageEndPos();
 
         table.setRecordNum(table.getRecordNum() + records.size());
+        List<Page> pageList = new ArrayList<>();
+
         for (List<String> columns : records) {
 
             byte[] data = record2bytes(columns,types);
@@ -59,7 +61,8 @@ public class Engine {
                 page.setPageEndPos(pageEndPos);
                 page.setData(pageBytes);
                 ConfigCenter.flushConfig(dbName);
-                ioCenter.writePage(dbName,tableName,page);
+                //ioCenter.writePage(dbName,tableName,page);
+                pageList.add(page);
 
                 table.setPageNum(table.getPageNum() + 1);//更新一下页号
                 Page newPage = new Page();
@@ -72,10 +75,12 @@ public class Engine {
                 pageBytes = newData;
                 newPage.setData(newData);
                 page = newPage;
-                ioCenter.writePage(dbName,tableName,page);
+                //ioCenter.writePage(dbName,tableName,page);
+                pageList.add(page);
             }
 
         }
+        ioCenter.writePages(dbName,tableName,pageList);
 
         pageBytes = ByteUtil.updateMaxId(pageBytes,page.getMaxId());
         pageBytes = ByteUtil.updateEndPos(pageBytes,pageEndPos);
