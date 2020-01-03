@@ -64,7 +64,7 @@ public class IOCenter {
     }
 
     private Page buildEmptyPage() {
-        byte[] pageIdBytes = ByteUtil.int2byte(1);
+        byte[] pageIdBytes = ByteUtil.int2byte(0);
         byte[] pageIndexId = ByteUtil.int2byte(0);
         byte[] pageEndPos = ByteUtil.int2byte(16);
         byte[] header = new byte[0];
@@ -74,7 +74,7 @@ public class IOCenter {
         header = ByteUtil.byteMerger(header, pageEndPos);  // end pos
         //build header end   =>>>>   start build record
         byte[] data = ByteUtil.byteMerger(header, new byte[1024 * 16 - header.length]);
-        return new Page(1, 1, 0, 16, data, null);
+        return new Page(1, 0, 0, 16, data, null);
     }
 
     public Page getPage(String db, String table, int pageNum) {
