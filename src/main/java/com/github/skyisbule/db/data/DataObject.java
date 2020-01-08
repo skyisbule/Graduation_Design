@@ -144,6 +144,7 @@ public class DataObject {
                 }
                 line = reader.readLine();
             }
+            mainService.batchInsert(dbName, tableName, records);
         } catch (Exception e) {
             System.err.println("[skyDB error]load data error please check your file data or parser");
             e.printStackTrace();

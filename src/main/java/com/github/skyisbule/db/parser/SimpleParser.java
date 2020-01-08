@@ -14,8 +14,7 @@ public class SimpleParser implements Parser {
 
     @Override
     public List<String> doParser(String line, ParseContext context) {
-        List<String> columns = Arrays.asList(line.split(BLANK_SPILT));
-        return columns;
+        return Arrays.asList(line.split(BLANK_SPILT));
     }
 
 }
