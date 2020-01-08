@@ -12,8 +12,8 @@ public interface Computer<T> {
 
     void doCompute(T t, ComputeContext context);
 
-    void afterOnePage();
+    void afterOnePage(ComputeContext context);
 
-    void afterAll();
+    void afterAll(ComputeContext context);
 
 }

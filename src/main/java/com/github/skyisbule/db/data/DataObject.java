@@ -112,9 +112,9 @@ public class DataObject {
             for (Object obj : list) {
                 computer.doCompute(obj, context);
             }
-            computer.afterOnePage();
+            computer.afterOnePage(context);
         }
-        computer.afterAll();
+        computer.afterAll(context);
     }
 
 }
