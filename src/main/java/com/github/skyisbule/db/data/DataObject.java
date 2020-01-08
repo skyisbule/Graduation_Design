@@ -1,5 +1,10 @@
 package com.github.skyisbule.db.data;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -8,10 +13,13 @@ import java.util.List;
 import com.github.skyisbule.db.MainService;
 import com.github.skyisbule.db.center.ConfigCenter;
 import com.github.skyisbule.db.common.ColumnTypeEnum;
+import com.github.skyisbule.db.common.DefaultConfig;
 import com.github.skyisbule.db.compute.Computer;
 import com.github.skyisbule.db.context.ComputeContext;
+import com.github.skyisbule.db.context.ParseContext;
 import com.github.skyisbule.db.enty.Db;
 import com.github.skyisbule.db.enty.Table;
+import com.github.skyisbule.db.parser.Parser;
 import com.github.skyisbule.db.util.JsonUtil;
 
 public class DataObject {
@@ -62,7 +70,7 @@ public class DataObject {
             }
             records.add(record);
         }
-        mainService.batchInsert(dbName,tableName,records);
+        mainService.batchInsert(dbName, tableName, records);
     }
 
     public List<Object> getPage(int page) throws IllegalAccessException, InstantiationException {
@@ -99,7 +107,7 @@ public class DataObject {
         System.out.println(JsonUtil.getJson(ConfigCenter.getDbByName(dbName).tables.get(tableName)));
     }
 
-    public void showBrothers(){
+    public void showBrothers() {
         System.out.println(JsonUtil.getJson(db));
     }
 
@@ -115,6 +123,32 @@ public class DataObject {
             computer.afterOnePage(context);
         }
         computer.afterAll(context);
+    }
+
+    public void fromFile(String path, Parser parser) {
+        try {
+            File file = new File(path);
+            ParseContext context = new ParseContext();
+            LinkedList<List<String>> records = new LinkedList<>();
+            BufferedReader reader = new BufferedReader(
+                new InputStreamReader(
+                    new FileInputStream(file)
+                )
+            );
+            String line = reader.readLine();
+            while (line != null) {
+                records.add(parser.doParser(line, context));
+                if (records.size() > DefaultConfig.FLUSH_DISK_FLAG_NUM) {
+                    mainService.batchInsert(dbName, tableName, records);
+                    records = new LinkedList<>();
+                }
+                line = reader.readLine();
+            }
+        } catch (Exception e) {
+            System.err.println("[skyDB error]load data error please check your file data or parser");
+            e.printStackTrace();
+        }
+
     }
 
 }
