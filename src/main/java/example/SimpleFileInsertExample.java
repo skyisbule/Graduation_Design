@@ -18,7 +18,7 @@ public class SimpleFileInsertExample {
         //创建一个数据集，指定版本为1.1，不和1.0冲突
         DataObject dataObject = db.create(User.class, "1.1");
         //指定文件，并使用默认的解析器
-        dataObject.fromFile("/Users/hqt/Desktop/data.text",new SimpleParser());
+        dataObject.fromFile("/Users/hqt/Desktop/data.text", new SimpleParser(" "));
         //打印一下数据
         ConsoleUtil.show(dataObject.getPage(1));
     }
