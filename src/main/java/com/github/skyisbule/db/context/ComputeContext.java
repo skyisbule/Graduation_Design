@@ -3,6 +3,7 @@ package com.github.skyisbule.db.context;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.github.skyisbule.db.data.DataObject;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -15,5 +16,24 @@ import lombok.Setter;
 public class ComputeContext {
 
     private List<Object> resultList = new ArrayList<>();
+
+    private List<DataObject> dataObjects = new ArrayList<>();
+
+    public int nowPage = 1;
+
+    private int totalPage;
+
+    private boolean pageChangeFlag = false;
+
+    private boolean forceExit = false;
+
+    public void forceExit(){
+        this.forceExit = true;
+    }
+
+    private void setNowPage(int page){
+        pageChangeFlag = true;
+        nowPage = page;
+    }
 
 }

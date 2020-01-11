@@ -3,7 +3,6 @@ package com.github.skyisbule.db.data;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -115,13 +114,23 @@ public class DataObject {
         int pageNum = table.pageNum;
 
         computer.init(context);
-        for (int i = 1; i <= pageNum; i++) {
+        context.setTotalPage(pageNum);
+        int i;
+        while (context.getNowPage() <= context.getTotalPage()) {
+            i = context.getNowPage();
             List<Object> list = this.getPage(i);
             for (Object obj : list) {
                 computer.doCompute(obj, context);
             }
             computer.afterOnePage(context);
+            if (!context.isPageChangeFlag()) {
+                context.nowPage = i + 1;
+            }
+            if (context.isForceExit()) {
+                break;
+            }
         }
+
         computer.afterAll(context);
     }
 
