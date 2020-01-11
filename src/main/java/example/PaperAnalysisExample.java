@@ -1,5 +1,14 @@
 package example;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+
+import com.github.skyisbule.db.SkyDB;
+import com.github.skyisbule.db.data.DataObject;
+import com.github.skyisbule.db.util.ConsoleUtil;
+import example.po.Paper;
+
 /**
  * 这是一个来自真实案例的例子：
  * 首先说一下项目背景，大一的时候老师交给我一份论文数据，让我去做引用关系分析，它的表现形式是在mysql里的一张表。
@@ -45,4 +54,51 @@ package example;
  * 故这个示例文件又是为了演示如何使用本计算引擎，来优雅地解决这个问题。
  */
 public class PaperAnalysisExample {
+
+    private static void buildData(DataObject dataObject) throws IllegalAccessException {
+
+        int insertNum = 10000;
+
+        List<Object> insertList = new ArrayList<>(10000);
+        Random random = new Random();
+        for (int i = 1; i < insertNum; i++) {
+
+            int refNum = random.nextInt(29) + 1;
+            Paper paper = new Paper();
+            StringBuilder sb = new StringBuilder();
+            for (int loop = 0; loop < refNum - 1; loop++) {
+                int ref = random.nextInt(insertNum -1) + 1;
+                sb.append(ref).append(" ");
+            }
+            int ref = random.nextInt(insertNum-1) + 1;
+            sb.append(ref).append(" ");
+
+            paper.setId(i);
+            paper.setRefs(sb.toString());
+
+            insertList.add(paper);
+
+            if (insertList.size() > 10000){
+                dataObject.bathInsert(insertList);
+                insertList = new ArrayList<>(10000);
+            }
+        }
+
+        dataObject.bathInsert(insertList);
+
+    }
+
+
+    public static void main(String[] args) throws IllegalAccessException, InstantiationException {
+        SkyDB skyDB = SkyDB.getInstance();
+        DataObject dataObject = skyDB.get(Paper.class,"1.0");
+
+        //buildData(dataObject);
+
+        List<Object> data = dataObject.getPage(5);
+
+        ConsoleUtil.show(data);
+
+    }
+
 }
