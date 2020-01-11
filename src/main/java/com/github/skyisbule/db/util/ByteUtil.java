@@ -59,6 +59,10 @@ public class ByteUtil {
         return write(data,ByteUtil.int2byte(target),8);
     }
 
+    public static byte[] updateMinId(byte[] data,int target){
+        return write(data,ByteUtil.int2byte(target),4);
+    }
+
     public static byte[] updateEndPos(byte[] data,int target){
         return write(data,ByteUtil.int2byte(target),12);
     }

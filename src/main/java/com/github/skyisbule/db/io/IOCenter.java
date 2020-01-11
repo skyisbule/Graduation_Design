@@ -64,8 +64,8 @@ public class IOCenter {
     }
 
     private Page buildEmptyPage() {
-        byte[] pageIdBytes = ByteUtil.int2byte(0);
-        byte[] pageIndexId = ByteUtil.int2byte(0);
+        byte[] pageIdBytes = ByteUtil.int2byte(1);
+        byte[] pageIndexId = ByteUtil.int2byte(1);
         byte[] pageEndPos = ByteUtil.int2byte(16);
         byte[] header = new byte[0];
         header = ByteUtil.byteMerger(header, pageIdBytes); // page num

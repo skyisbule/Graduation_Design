@@ -56,6 +56,7 @@ public class Engine {
                 page.setData(pageBytes);
             }else{
                 //写满了  那就更新信息写入io
+                pageBytes = ByteUtil.updateMinId(pageBytes,page.getMinId());
                 pageBytes = ByteUtil.updateMaxId(pageBytes,page.getMaxId());
                 pageBytes = ByteUtil.updateEndPos(pageBytes,pageEndPos);
                 page.setPageEndPos(pageEndPos);
@@ -79,6 +80,7 @@ public class Engine {
 
         }
 
+        pageBytes = ByteUtil.updateMinId(pageBytes,page.getMinId());
         pageBytes = ByteUtil.updateMaxId(pageBytes,page.getMaxId());
         pageBytes = ByteUtil.updateEndPos(pageBytes,pageEndPos);
         page.setData(pageBytes);
