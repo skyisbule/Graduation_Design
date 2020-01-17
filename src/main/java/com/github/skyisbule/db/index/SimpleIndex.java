@@ -25,6 +25,8 @@ public class SimpleIndex implements Index {
 
     private List<Page> pageList = new ArrayList<>();
 
+    private static final int MIN_FIND_SIZE = 10;
+
     @Override
     public boolean sync() {
         return false;
@@ -54,8 +56,42 @@ public class SimpleIndex implements Index {
         return false;
     }
 
+    //采取少数据量线性查找，大量数据量二分查找的策略，最大化的保障效率。
     @Override
     public int getPageNum(int id) {
+        if (pageList.size() < MIN_FIND_SIZE) {
+            return linearSearch(id, pageList, 0, pageList.size());
+        }
+        //代表索引已经很大了，线性查找很亏，所以从这里开始走二分查找。
+        int min = 0;
+        int max = pageList.size();
+        while (true) {
+            int medium = (min + max) / 2;
+            Page page = pageList.get(medium);
+            if (id >= page.getMinId() && id <= page.getMaxId()) {
+                return page.getPageNum();
+            }
+            if (id < page.getMinId()) {
+                max = medium;
+            } else {//代表id一定在这个页表的后边
+                min = medium;
+            }
+            if (max - min < MIN_FIND_SIZE) {
+                return linearSearch(id, pageList, min, max);
+            }
+        }
+    }
+
+    private int linearSearch(int id, List<Page> pages, int begin, int end) {
+        for (int i = begin; i < end; i++) {
+            Page page = pages.get(i);
+            if (page.getMinId() >= id && page.getMaxId() >= id) {
+                return page.getPageNum();
+            }
+        }
+        System.out.println(
+            "[skyDB info]try find index error,nothing match,please check your operation for " + targetFile + " "
+                + id);
         return 0;
     }
 
@@ -81,6 +117,7 @@ public class SimpleIndex implements Index {
             indexPage.setPageNum(page.getPageNum());
             pageList.add(indexPage);
         }
+        flush();
     }
 
     @Override
@@ -88,12 +125,13 @@ public class SimpleIndex implements Index {
 
     }
 
-    public void flush(){
+    public void flush() {
         File file = new File(targetFile);
         try {
             BufferedWriter writer = new BufferedWriter(new FileWriter(file));
             String json = JsonUtil.getJson(pageList);
             writer.write(json);
+            writer.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
