@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Random;
 
 import com.github.skyisbule.db.SkyDB;
+import com.github.skyisbule.db.compute.Computer;
+import com.github.skyisbule.db.context.ComputeContext;
 import com.github.skyisbule.db.data.DataObject;
 import com.github.skyisbule.db.util.ConsoleUtil;
 import example.po.Paper;
@@ -91,11 +93,89 @@ public class PaperAnalysisExample {
 
     public static void main(String[] args) throws IllegalAccessException, InstantiationException {
         SkyDB skyDB = SkyDB.getInstance();
-        DataObject dataObject = skyDB.get(Paper.class,"1.0");
+        DataObject dataObject = skyDB.get(Paper.class, "1.0");
+
+        //List<Object> data = dataObject.getPage(1);
+
+        //ConsoleUtil.show(data);
+
+        //if (1==1)return;
+
+        DataObject mergedObject = skyDB.create(Paper.class, "1.4");
+        //
+        //List<Object> datas = mergedObject.getPage(1);
+        //
+        //ConsoleUtil.show(datas);
+        //
+        //if (1==1)return;
+
+
+        dataObject.doCompute(new Computer<Paper>() {
+
+            static final int mergedListSize = 1000;
+
+            private List<Object> mergedList = new ArrayList<>(mergedListSize);
+
+            @Override
+            public void init(ComputeContext computeContext) {
+
+            }
+
+            @Override
+            public void doCompute(Paper paper, ComputeContext context) {
+                Integer id = paper.getId();
+                List<Object> temp = context.getResultList();
+                if (temp.size() == 0) {
+                    temp.add(paper);
+                } else {
+                    //当前列表里的最后一个论文对象
+                    Paper leastPaper = ((Paper)temp.get(temp.size() - 1));
+                    if (leastPaper.getId().equals(id)) {
+                        temp.add(paper);
+                    } else {
+                        doMergePaper(context.getResultList());
+                        context.getResultList().clear();
+                        context.getResultList().add(paper);
+                    }
+                }
+            }
+
+            @Override
+            public void afterOnePage(ComputeContext context) {
+
+            }
+
+            @Override
+            public void afterAll(ComputeContext context) {
+                List<Object> list = context.getResultList();
+                if (list.size() > 0) {
+                    doMergePaper(list);
+                }
+            }
+
+            private void doMergePaper(List<Object> list) {
+                //把列表中的论文拿出来合并一下
+                StringBuilder refs = new StringBuilder();
+                for (Object o : list) {
+                    refs.append(((Paper)o).refs);
+                }
+                Paper newPaper = new Paper();
+                newPaper.setId(((Paper)list.get(0)).getId());
+                newPaper.setRefs(refs.toString());
+                if (mergedList.size() < mergedListSize){
+                    mergedList.add(newPaper);
+                }else{
+                    mergedObject.bathInsert(mergedList);
+                    mergedList.clear();
+                }
+            }
+
+        });
+
 
         //buildData(dataObject);
 
-        List<Object> data = dataObject.getPage(5);
+        List<Object> data = mergedObject.getPage(1);
 
         ConsoleUtil.show(data);
 

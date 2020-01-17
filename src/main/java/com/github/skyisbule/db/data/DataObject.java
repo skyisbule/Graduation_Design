@@ -59,17 +59,22 @@ public class DataObject {
         }
     }
 
-    public void bathInsert(List<Object> list) throws IllegalAccessException {
-        LinkedList<List<String>> records = new LinkedList<>();
-        for (Object obj : list) {
-            List<String> record = new ArrayList<>();
-            for (Field field : clazz.getFields()) {
-                field.setAccessible(true);
-                record.add(field.get(obj).toString());
+    public void bathInsert(List<Object> list){
+        try {
+            LinkedList<List<String>> records = new LinkedList<>();
+            for (Object obj : list) {
+                List<String> record = new ArrayList<>();
+                for (Field field : clazz.getFields()) {
+                    field.setAccessible(true);
+                    record.add(field.get(obj).toString());
+                }
+                records.add(record);
             }
-            records.add(record);
+            mainService.batchInsert(dbName, tableName, records);
+        }catch (Exception e){
+            System.err.println("[skyDB error]bathInsert failed please check your data or dataObject...");
+            e.printStackTrace();
         }
-        mainService.batchInsert(dbName, tableName, records);
     }
 
     public List<Object> getPage(int page) throws IllegalAccessException, InstantiationException {
