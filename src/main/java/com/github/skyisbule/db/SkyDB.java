@@ -86,12 +86,16 @@ public class SkyDB {
         return object;
     }
 
-    public DataObject get(Class clazz, String version) {
+    public DataObject getOrCreate(Class clazz, String version) {
         String dbName = clazz.getName();
         String fullName = dbName + "_" + version;
         if (dataObjectMap.containsKey(fullName)) {
             return dataObjectMap.get(fullName);
         } else {
+            Db db = ConfigCenter.getDbByName(dbName);
+            if (db == null || db.getTableByName(version) == null){
+                return create(clazz,version);
+            }
             DataObject object = new DataObject(mainService, clazz, version);
             dataObjectMap.put(fullName, object);
             return object;

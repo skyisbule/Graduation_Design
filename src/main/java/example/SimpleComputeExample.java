@@ -17,7 +17,7 @@ public class SimpleComputeExample {
         //创建SkyDB入口
         SkyDB db = SkyDB.getInstance();
         //创建一个数据集，指定版本为1.0
-        DataObject dataObject = db.get(User.class, "1.0");
+        DataObject dataObject = db.getOrCreate(User.class, "1.0");
 
         //开始对任务进行计算，如果计算比较复杂的话，推荐把computer实现另写一个类，而不是像下面这样只适合简单的情况。
         dataObject.doCompute(new Computer<User>() {
