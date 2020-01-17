@@ -19,7 +19,10 @@ public interface Index {
     public int getPageNum(int id);
 
     //添加索引
-    public void addIndex(int id);
+    public void addIndex(Page page);
+
+    //添加索引
+    public void addIndex(List<Page> page);
 
     //删除索引
     public void delIndex(int id);

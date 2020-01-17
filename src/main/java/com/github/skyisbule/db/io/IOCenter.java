@@ -3,7 +3,7 @@ package com.github.skyisbule.db.io;
 import com.github.skyisbule.db.common.DefaultConfig;
 import com.github.skyisbule.db.enty.Page;
 import com.github.skyisbule.db.index.Index;
-import com.github.skyisbule.db.index.SimpleIndex;
+import com.github.skyisbule.db.index.IndexManager;
 import com.github.skyisbule.db.util.ByteUtil;
 
 import java.io.File;
@@ -15,8 +15,6 @@ import java.util.List;
 
 public class IOCenter {
 
-    private Index index = new SimpleIndex();
-
     public boolean writePage(String db, String table, Page page) {
         String path = DefaultConfig.BASE_WORK_PATH + db + "_" + table + ".db";
         try {
@@ -25,8 +23,11 @@ public class IOCenter {
             file.seek((long)(page.getPageNum() - 1) * size);
             file.write(page.getData());
             file.close();
-            Index indexImpl = index.getInstance(db, table);
-            indexImpl.flush(page);
+            //如果等于0的话代表是建表，此时不写索引
+            if (page.minId != 0 && page.maxId != 0) {
+                Index indexImpl = IndexManager.getIndex(db, table);
+                indexImpl.addIndex(page);
+            }
             return true;
         } catch (Exception e) {
             e.printStackTrace();
@@ -50,8 +51,8 @@ public class IOCenter {
             }
             file.write(bytes);
             file.close();
-            Index indexImpl = index.getInstance(db, table);
-            indexImpl.flush(pages);
+            Index indexImpl = IndexManager.getIndex(db, table);
+            indexImpl.addIndex(pages);
             return true;
         } catch (Exception e) {
             e.printStackTrace();

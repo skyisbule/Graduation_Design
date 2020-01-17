@@ -24,8 +24,8 @@ public class IndexManager {
         }
     }
 
-    public static void getIndex(DataObject dataObject) {
-        getIndex(dataObject.getDbName(), dataObject.getTableName());
+    public static Index getIndex(DataObject dataObject) {
+        return getIndex(dataObject.getDbName(), dataObject.getTableName());
     }
 
     private static String getKey(String key, String version) {
