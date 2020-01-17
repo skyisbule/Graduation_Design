@@ -166,4 +166,12 @@ public class DataObject {
 
     }
 
+    public String getDbName() {
+        return dbName;
+    }
+
+    public String getTableName() {
+        return tableName;
+    }
+
 }

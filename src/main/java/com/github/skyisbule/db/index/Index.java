@@ -1,5 +1,9 @@
 package com.github.skyisbule.db.index;
 
+import java.util.List;
+
+import com.github.skyisbule.db.enty.Page;
+
 public interface Index {
 
     //将索引同步到文件
@@ -19,5 +23,13 @@ public interface Index {
 
     //删除索引
     public void delIndex(int id);
+
+    //把索引刷新进文件
+    public void flush(Page page);
+
+    public void flush(List<Page> pages);
+
+    //获取实例，如果没有的话，实现类应该创建一个
+    public Index getInstance(String db, String table);
 
 }
