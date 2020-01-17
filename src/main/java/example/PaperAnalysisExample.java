@@ -90,24 +90,45 @@ public class PaperAnalysisExample {
 
     }
 
+    private static void buildSourceData(DataObject dataObject){
+        int totalRecord = 0;
+        int insertNum = 10000;
+        List<Object> insertList = new ArrayList<>(10000);
+        Random random = new Random();
+        for (int i = 1; i < insertNum; i++) {
+            //这篇论文引用了多少篇论文
+            int refsNum = random.nextInt(20) + 1;
+            for (int loop = 0; loop < refsNum; loop++) {
+                Paper paper = new Paper();
+                paper.setId(i);
+                paper.setRefs(String.valueOf(random.nextInt(insertNum)));
+                insertList.add(paper);
+                if (insertList.size() > 10000){
+                    dataObject.bathInsert(insertList);
+                    totalRecord += insertList.size();
+                    insertList.clear();
+                }
+            }
+        }
+        dataObject.bathInsert(insertList);
+        totalRecord += insertList.size();
+        insertList.clear();
+        System.out.println("complete total: " + totalRecord);
+
+    }
+
 
     public static void main(String[] args) throws IllegalAccessException, InstantiationException {
         SkyDB skyDB = SkyDB.getInstance();
-        DataObject dataObject = skyDB.get(Paper.class, "1.0");
+        DataObject dataObject = skyDB.create(Paper.class, "1.0");
+        buildSourceData(dataObject);
 
-        //List<Object> data = dataObject.getPage(1);
+        List<Object> data = dataObject.getPage(1);
 
-        //ConsoleUtil.show(data);
+        ConsoleUtil.show(data);
 
-        //if (1==1)return;
 
-        DataObject mergedObject = skyDB.create(Paper.class, "1.4");
-        //
-        //List<Object> datas = mergedObject.getPage(1);
-        //
-        //ConsoleUtil.show(datas);
-        //
-        //if (1==1)return;
+        DataObject mergedObject = skyDB.create(Paper.class, "1.1");
 
 
         dataObject.doCompute(new Computer<Paper>() {
@@ -157,7 +178,7 @@ public class PaperAnalysisExample {
                 //把列表中的论文拿出来合并一下
                 StringBuilder refs = new StringBuilder();
                 for (Object o : list) {
-                    refs.append(((Paper)o).refs);
+                    refs.append(((Paper)o).refs).append(" ");
                 }
                 Paper newPaper = new Paper();
                 newPaper.setId(((Paper)list.get(0)).getId());
@@ -175,7 +196,7 @@ public class PaperAnalysisExample {
 
         //buildData(dataObject);
 
-        List<Object> data = mergedObject.getPage(1);
+        data = mergedObject.getPage(1);
 
         ConsoleUtil.show(data);
 
