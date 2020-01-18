@@ -17,6 +17,7 @@ public class BathInsertExample {
     public static void main(String[] args) throws IllegalAccessException, InstantiationException {
         //创建db实例
         SkyDB skyDB = SkyDB.getInstance();
+        skyDB.dropIfExit(User.class, "1.0");
         //由于 simpleInsertExample中已经创建了这个数据集 所以这里直接get即可
         //如果你把数据文件删除了 或执行了drop 则在这里你需要使用create
         DataObject dataObject = skyDB.getOrCreate(User.class, "1.0");
@@ -32,7 +33,7 @@ public class BathInsertExample {
         dataObject.bathInsert(data);
         long endTime = System.currentTimeMillis();
         //看一下插入所花费的时间
-        System.out.println("插入10000条数据总共花费："+(endTime-beginTime) +"ms");
+        System.out.println("插入10000条数据总共花费：" + (endTime - beginTime) + "ms");
         //打印一下此时的数据集信息
         dataObject.showInfo();
 

@@ -1,5 +1,6 @@
 package com.github.skyisbule.db;
 
+import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -9,6 +10,7 @@ import java.util.Map;
 import com.github.skyisbule.db.center.ConfigCenter;
 import com.github.skyisbule.db.center.InstanceManager;
 import com.github.skyisbule.db.common.ColumnTypeEnum;
+import com.github.skyisbule.db.common.DefaultConfig;
 import com.github.skyisbule.db.data.DataObject;
 import com.github.skyisbule.db.enty.Db;
 import com.github.skyisbule.db.enty.Table;
@@ -93,12 +95,49 @@ public class SkyDB {
             return dataObjectMap.get(fullName);
         } else {
             Db db = ConfigCenter.getDbByName(dbName);
-            if (db == null || db.getTableByName(version) == null){
-                return create(clazz,version);
+            if (db == null || db.getTableByName(version) == null) {
+                return create(clazz, version);
             }
             DataObject object = new DataObject(mainService, clazz, version);
             dataObjectMap.put(fullName, object);
             return object;
+        }
+    }
+
+    /**
+     * 先从缓存里删掉
+     * 再删库文件
+     * 再删索引文件
+     */
+    public void dropIfExit(Class clazz, String version) {
+        String dbName = clazz.getName();
+        Map<String, Db> dbInfo = ConfigCenter.getDbInfo();
+        if (dbInfo.get(dbName) == null) {
+            return;
+        }
+        String targetFile = DefaultConfig.BASE_WORK_PATH + dbName + "_" + version;
+        //只有一张表的情况下直接删库
+        if (dbInfo.get(dbName).tables.size() == 1) {
+            dbInfo.remove(dbName);
+            File dbFile = new File(DefaultConfig.BASE_WORK_PATH + dbName + ".config");
+            //dbFile.
+            if (!dbFile.delete()) {
+                System.err.println("[skyDB error]delete db file error:" + targetFile);
+            }
+        } else {
+            //多张表的话 就只能采取保留策略
+            dbInfo.get(dbName).tables.remove(version);
+            ConfigCenter.flushConfig(dbName);
+        }
+        //接下来需要删除真实的文件
+
+        File dataFile = new File(targetFile + ".db");
+        if (!dataFile.delete()) {
+            System.err.println("[skyDB error]delete data file error:" + targetFile);
+        }
+        File indexFile = new File(targetFile + ".index");
+        if (!indexFile.delete()) {
+            System.err.println("[skyDB error]delete index file error:" + targetFile);
         }
     }
 
