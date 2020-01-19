@@ -15,15 +15,15 @@ import example.po.Paper;
  * 这是一个来自真实案例的例子：
  * 首先说一下项目背景，大一的时候老师交给我一份论文数据，让我去做引用关系分析，它的表现形式是在mysql里的一张表。
  * 这张表有两列 论文ID 引用的论文ID 所以看上去它长这个样子:
- *     --------
- *     |id |ref|
- *     | 1 | 2 |
- *     | 1 | 3 |
- *     | 1 | 4 |
- *     | 2 | 8 |
- *     | 2 | 11|
- *     | 3 | 5 |
- *     ---------
+ * --------
+ * |id |ref|
+ * | 1 | 2 |
+ * | 1 | 3 |
+ * | 1 | 4 |
+ * | 2 | 8 |
+ * | 2 | 11|
+ * | 3 | 5 |
+ * ---------
  * 第一列代表一篇论文的唯一id，第二列代表这篇论文它引用了哪些论文，从上图的数据中（当然这个数据是我随便打的，不是真实数据）可以看到，
  * id为1的这篇论文它引用了id为2、3、4的论文，id为2的论文引用了id为8、11的论文，等等。
  * 嗯，听起来很简单的样子，就是个一对多的关系，但问题就在于，这张表有9亿8000多万行，并且没有任何索引，所以基于它的任何sql查询
@@ -36,12 +36,12 @@ import example.po.Paper;
  * 那么当前的简单架构显然无法支撑起业务，那么就必然要对数据进行一次预处理，去优化查询效率。
  * 当时的我虽然刚开始学编程，但也有索引和数据集合的概念，于是我很容易的想到了一个办法：压缩数据，建立唯一索引。
  * 即把这张表变为：
- *     -----------------
- *     |id |    refs    |
- *     | 1 |    2,3,4   |
- *     | 2 |    8,11    |
- *     | 3 |      5     |
- *     ------------------
+ * -----------------
+ * |id |    refs    |
+ * | 1 |    2,3,4   |
+ * | 2 |    8,11    |
+ * | 3 |      5     |
+ * ------------------
  * 并把id这列变成主键，那么我们查找引用关系的话就是针对主键的查找了，并且因为压缩的原因，整张表的行数也会非常明显的下降，mysql的压力也会小很多，
  * 最终的话，批量处理过后，整张表大概只有3000万行数据，而又因为所有的查询都是主键查询，于是单次db查询基本是秒级返回。
  * 于是一次论文网络计算的时间也从数天被压缩到几分钟到几十分钟的级别，并且如果引用关系不复杂的话还要更快一些（因为很多论文都会引用同几篇论文，
@@ -69,10 +69,10 @@ public class PaperAnalysisExample {
             Paper paper = new Paper();
             StringBuilder sb = new StringBuilder();
             for (int loop = 0; loop < refNum - 1; loop++) {
-                int ref = random.nextInt(insertNum -1) + 1;
+                int ref = random.nextInt(insertNum - 1) + 1;
                 sb.append(ref).append(" ");
             }
-            int ref = random.nextInt(insertNum-1) + 1;
+            int ref = random.nextInt(insertNum - 1) + 1;
             sb.append(ref).append(" ");
 
             paper.setId(i);
@@ -80,7 +80,7 @@ public class PaperAnalysisExample {
 
             insertList.add(paper);
 
-            if (insertList.size() > 10000){
+            if (insertList.size() > 10000) {
                 dataObject.bathInsert(insertList);
                 insertList = new ArrayList<>(10000);
             }
@@ -90,7 +90,7 @@ public class PaperAnalysisExample {
 
     }
 
-    private static void buildSourceData(DataObject dataObject){
+    private static void buildSourceData(DataObject dataObject) {
         int totalRecord = 0;
         int insertNum = 10000;
         List<Object> insertList = new ArrayList<>(10000);
@@ -103,7 +103,7 @@ public class PaperAnalysisExample {
                 paper.setId(i);
                 paper.setRefs(String.valueOf(random.nextInt(insertNum)));
                 insertList.add(paper);
-                if (insertList.size() > 10000){
+                if (insertList.size() > 10000) {
                     dataObject.bathInsert(insertList);
                     totalRecord += insertList.size();
                     insertList.clear();
@@ -117,7 +117,6 @@ public class PaperAnalysisExample {
 
     }
 
-
     public static void main(String[] args) throws IllegalAccessException, InstantiationException {
         SkyDB skyDB = SkyDB.getInstance();
         DataObject dataObject = skyDB.create(Paper.class, "1.0");
@@ -127,9 +126,7 @@ public class PaperAnalysisExample {
 
         ConsoleUtil.show(data);
 
-
         DataObject mergedObject = skyDB.create(Paper.class, "1.1");
-
 
         dataObject.doCompute(new Computer<Paper>() {
 
@@ -172,6 +169,9 @@ public class PaperAnalysisExample {
                 if (list.size() > 0) {
                     doMergePaper(list);
                 }
+                if (mergedList.size() > 0) {
+                    mergedObject.bathInsert(mergedList);
+                }
             }
 
             private void doMergePaper(List<Object> list) {
@@ -183,18 +183,14 @@ public class PaperAnalysisExample {
                 Paper newPaper = new Paper();
                 newPaper.setId(((Paper)list.get(0)).getId());
                 newPaper.setRefs(refs.toString());
-                if (mergedList.size() < mergedListSize){
-                    mergedList.add(newPaper);
-                }else{
+                mergedList.add(newPaper);
+                if (mergedList.size() > mergedListSize){
                     mergedObject.bathInsert(mergedList);
                     mergedList.clear();
                 }
             }
 
         });
-
-
-        //buildData(dataObject);
 
         data = mergedObject.getPage(1);
 
