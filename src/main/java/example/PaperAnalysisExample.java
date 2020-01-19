@@ -119,12 +119,14 @@ public class PaperAnalysisExample {
 
     public static void main(String[] args) throws IllegalAccessException, InstantiationException {
         SkyDB skyDB = SkyDB.getInstance();
-        DataObject dataObject = skyDB.create(Paper.class, "1.0");
+        DataObject dataObject = skyDB.getOrCreate(Paper.class, "1.0");
         buildSourceData(dataObject);
 
         List<Object> data = dataObject.getPage(1);
 
         ConsoleUtil.show(data);
+
+        if (1==1)return;
 
         DataObject mergedObject = skyDB.create(Paper.class, "1.1");
 

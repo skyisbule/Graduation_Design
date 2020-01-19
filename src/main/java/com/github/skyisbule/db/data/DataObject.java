@@ -59,7 +59,7 @@ public class DataObject {
         }
     }
 
-    public void bathInsert(List<Object> list){
+    public void bathInsert(List<Object> list) {
         try {
             LinkedList<List<String>> records = new LinkedList<>();
             for (Object obj : list) {
@@ -71,38 +71,44 @@ public class DataObject {
                 records.add(record);
             }
             mainService.batchInsert(dbName, tableName, records);
-        }catch (Exception e){
+        } catch (Exception e) {
             System.err.println("[skyDB error]bathInsert failed please check your data or dataObject...");
             e.printStackTrace();
         }
     }
 
-    public List<Object> getPage(int page) throws IllegalAccessException, InstantiationException {
+    public List<Object> getPage(int page) {
+
         List<Object> result = new LinkedList<>();
-        LinkedList<ArrayList<String>> records = mainService.doSelect(dbName, tableName, page);
-        Db db = ConfigCenter.getDbByName(dbName);
-        Table table = db.getTableByName(tableName);
-        List<ColumnTypeEnum> types = table.getTypes();
+        try {
+            LinkedList<ArrayList<String>> records = mainService.doSelect(dbName, tableName, page);
+            Db db = ConfigCenter.getDbByName(dbName);
+            Table table = db.getTableByName(tableName);
+            List<ColumnTypeEnum> types = table.getTypes();
 
-        for (ArrayList<String> record : records) {
-            Object object = clazz.newInstance();
-            for (int i = 0; i < types.size(); i++) {
-                Field field = clazz.getFields()[i];
-                field.setAccessible(true);
-                ColumnTypeEnum typeEnum = types.get(i);
-                switch (typeEnum) {
-                    case STRING:
-                        field.set(object, record.get(i));
-                        break;
-                    case INT:
+            for (ArrayList<String> record : records) {
+                Object object = clazz.newInstance();
+                for (int i = 0; i < types.size(); i++) {
+                    Field field = clazz.getFields()[i];
+                    field.setAccessible(true);
+                    ColumnTypeEnum typeEnum = types.get(i);
+                    switch (typeEnum) {
+                        case STRING:
+                            field.set(object, record.get(i));
+                            break;
+                        case INT:
 
-                    case TIME:
-                        field.set(object, Integer.parseInt(record.get(i)));
-                        break;
+                        case TIME:
+                            field.set(object, Integer.parseInt(record.get(i)));
+                            break;
+                    }
+
                 }
-
+                result.add(object);
             }
-            result.add(object);
+        } catch (Exception e) {
+            System.err.println("[skyDB error]get page error.");
+            e.printStackTrace();
         }
         return result;
     }

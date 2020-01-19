@@ -12,6 +12,7 @@ import java.util.List;
 import com.github.skyisbule.db.common.DefaultConfig;
 import com.github.skyisbule.db.enty.Page;
 import com.github.skyisbule.db.util.JsonUtil;
+import com.google.gson.reflect.TypeToken;
 
 /**
  * 简单索引实现，底层会存储每个页表的maxid和minid并缓存进内存
@@ -40,7 +41,7 @@ public class SimpleIndex implements Index {
             if (file.exists()) {
                 BufferedReader reader = new BufferedReader(new FileReader(file));
                 String json = reader.readLine();
-                this.pageList = JsonUtil.fromJson(json, pageList.getClass());
+                pageList = JsonUtil.getGson().fromJson(json, new TypeToken<List<Page>>() {}.getType());
             } else {
                 if (!file.createNewFile()) {
                     throw new IOError(new Throwable("create file error :" + targetFile));
@@ -85,7 +86,7 @@ public class SimpleIndex implements Index {
     private int linearSearch(int id, List<Page> pages, int begin, int end) {
         for (int i = begin; i < end; i++) {
             Page page = pages.get(i);
-            if (page.getMinId() >= id && page.getMaxId() >= id) {
+            if (page.getMinId() <= id && page.getMaxId() >= id) {
                 return page.getPageNum();
             }
         }

@@ -14,4 +14,8 @@ public class JsonUtil {
         return gson.fromJson(json,classOfT);
     }
 
+    public static Gson getGson(){
+        return gson;
+    }
+
 }
