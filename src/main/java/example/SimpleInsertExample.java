@@ -14,7 +14,7 @@ import example.po.User;
  */
 public class SimpleInsertExample {
 
-    public static void main(String[] args) throws InstantiationException, IllegalAccessException {
+    public static void main(String[] args) {
         //创建SkyDB入口
         SkyDB db = SkyDB.getInstance();
         //创建一个数据集，指定版本为1.0

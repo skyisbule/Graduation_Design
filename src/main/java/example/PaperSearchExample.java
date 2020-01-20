@@ -10,6 +10,7 @@ import com.github.skyisbule.db.SkyDB;
 import com.github.skyisbule.db.data.DataObject;
 import com.github.skyisbule.db.index.Index;
 import com.github.skyisbule.db.index.IndexManager;
+import com.github.skyisbule.db.util.IOUtil;
 import com.github.skyisbule.db.util.JsonUtil;
 import example.po.Node;
 import example.po.Paper;
@@ -31,7 +32,8 @@ public class PaperSearchExample {
         //开始进行迭代查找
         PaperSearchExample e = new PaperSearchExample();
         List<Node> nodes = e.buildGridData(1, 3);
-        e.buildHTML(nodes, 2);
+        String html = e.buildHTML(nodes, 2);
+        IOUtil.forceWriteFile("/Users/hqt/Downloads/ECharts-Relationship-map-master/" + Paper.class.getName() + ".html",html);
     }
 
     //待分析的起始论文id,查询的层数
@@ -84,7 +86,7 @@ public class PaperSearchExample {
         return null;
     }
 
-    private void buildHTML(List<Node> nodeList, int hierarchy) {
+    private String buildHTML(List<Node> nodeList, int hierarchy) {
         List<HtmlNode> htmlNodes = new ArrayList<>();
         List<HtmlLink> links = new ArrayList<>();
         Set<Integer> set = new HashSet<>();
@@ -115,12 +117,12 @@ public class PaperSearchExample {
                 links.add(link);
             }
         }
-        //System.out.println(JsonUtil.getJson(htmlNodes));
-        //System.out.println("--------------------------");
-        //System.out.println(JsonUtil.getJson(links));
+        System.out.println(JsonUtil.getJson(htmlNodes));
+        System.out.println("--------------------------");
+        System.out.println(JsonUtil.getJson(links));
 
-        System.out.println(htmlHead + String.format(htmlTemplate, JsonUtil.getJson(htmlNodes), JsonUtil.getJson(links)));
-
+        String html = htmlHead + String.format(htmlTemplate, JsonUtil.getJson(htmlNodes), JsonUtil.getJson(links));
+        return html;
     }
 
     private class HtmlNode {
