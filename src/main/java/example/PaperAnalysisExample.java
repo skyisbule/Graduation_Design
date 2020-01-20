@@ -101,7 +101,7 @@ public class PaperAnalysisExample {
             for (int loop = 0; loop < refsNum; loop++) {
                 Paper paper = new Paper();
                 paper.setId(i);
-                paper.setRefs(String.valueOf(random.nextInt(insertNum)));
+                paper.setRefs(String.valueOf(random.nextInt(400) + 1));
                 insertList.add(paper);
                 if (insertList.size() > 10000) {
                     dataObject.bathInsert(insertList);
@@ -126,7 +126,6 @@ public class PaperAnalysisExample {
 
         ConsoleUtil.show(data);
 
-        if (1==1)return;
 
         DataObject mergedObject = skyDB.create(Paper.class, "1.1");
 

@@ -113,8 +113,12 @@ public class SimpleIndex implements Index {
         //为什么这么做看上边
         for (Page page : pages) {
             Page indexPage = new Page();
-            indexPage.setMaxId(page.getMaxId());
-            indexPage.setMinId(page.getMinId());
+            indexPage.setMaxId(page.getMaxId() - 1);
+            if (page.getPageNum() > 1) {
+                indexPage.setMinId(page.getMinId() - 1);
+            } else {
+                indexPage.setMinId(page.getMinId());
+            }
             indexPage.setPageNum(page.getPageNum());
             pageList.add(indexPage);
         }

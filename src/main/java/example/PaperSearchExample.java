@@ -1,13 +1,16 @@
 package example;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 import com.github.skyisbule.db.SkyDB;
 import com.github.skyisbule.db.data.DataObject;
 import com.github.skyisbule.db.index.Index;
 import com.github.skyisbule.db.index.IndexManager;
+import com.github.skyisbule.db.util.JsonUtil;
 import example.po.Node;
 import example.po.Paper;
 
@@ -27,7 +30,8 @@ public class PaperSearchExample {
 
         //开始进行迭代查找
         PaperSearchExample e = new PaperSearchExample();
-        e.buildGridData(2,1);
+        List<Node> nodes = e.buildGridData(1, 3);
+        e.buildHTML(nodes, 2);
     }
 
     //待分析的起始论文id,查询的层数
@@ -79,5 +83,137 @@ public class PaperSearchExample {
         }
         return null;
     }
+
+    private void buildHTML(List<Node> nodeList, int hierarchy) {
+        List<HtmlNode> htmlNodes = new ArrayList<>();
+        List<HtmlLink> links = new ArrayList<>();
+        Set<Integer> set = new HashSet<>();
+        for (Node node : nodeList) {
+            if (node.getHierarchy() == hierarchy) {
+                break;
+            }
+            set.add(node.getId());
+            for (Integer refId : node.getRefIds()) {
+                set.add(refId);
+            }
+        }
+        for (Integer id : set) {
+            HtmlNode htmlNode = new HtmlNode();
+            htmlNode.name = String.valueOf(id);
+            htmlNodes.add(htmlNode);
+        }
+
+        for (Node node : nodeList) {
+            if (node.getHierarchy() == hierarchy) {
+                break;
+            }
+
+            for (Integer id : node.getRefIds()) {
+                HtmlLink link = new HtmlLink();
+                link.source = String.valueOf(node.getId());
+                link.target = String.valueOf(id);
+                links.add(link);
+            }
+        }
+        //System.out.println(JsonUtil.getJson(htmlNodes));
+        //System.out.println("--------------------------");
+        //System.out.println(JsonUtil.getJson(links));
+
+        System.out.println(htmlHead + String.format(htmlTemplate, JsonUtil.getJson(htmlNodes), JsonUtil.getJson(links)));
+
+    }
+
+    private class HtmlNode {
+        public String name;
+    }
+
+    private class HtmlLink {
+        public String source;
+        public String target;
+    }
+
+    private static String htmlHead = "<!DOCTYPE html>\n"
+        + "<html>\n"
+        + "<head>\n"
+        + "    <meta name=\"viewport\" content=\"width=device-width\" />\n"
+        + "    <title>关系图谱</title>\n"
+        + "    <script src=\"jquery-1.10.2.min.js\"></script>\n"
+        + "    <script src=\"echarts.min.js\"></script>\n"
+        + "    <style type=\"text/css\">\n"
+        + "        html, body, #main { height: 100%; width: 100%; margin: 0; padding: 0 }\n"
+        + "    </style>\n"
+        + "</head>";
+
+    private static String htmlTemplate = "<!DOCTYPE html>\n"
+        + "<body>\n"
+        + "    <div id=\"main\" style=\"\"></div>\n"
+        + "    <script type=\"text/javascript\">\n"
+        + "        var myChart = echarts.init(document.getElementById('main'));\n"
+        + "        option = {\n"
+        + "            title: { text: '论文关系图谱' },\n"
+        + "            tooltip: {\n"
+        + "                formatter: function (x) {\n"
+        + "                    return x.data.des;\n"
+        + "                }\n"
+        + "            },\n"
+        + "            series: [\n"
+        + "                {\n"
+        + "                    type: 'graph',\n"
+        + "                    layout: 'force',\n"
+        + "                    symbolSize: 80,\n"
+        + "                    roam: true,\n"
+        + "                    edgeSymbol: ['circle', 'arrow'],\n"
+        + "                    edgeSymbolSize: [4, 10],\n"
+        + "                    edgeLabel: {\n"
+        + "                        normal: {\n"
+        + "                            textStyle: {\n"
+        + "                                fontSize: 20\n"
+        + "                            }\n"
+        + "                        }\n"
+        + "                    },\n"
+        + "                    force: {\n"
+        + "                        repulsion: 2500,\n"
+        + "                        edgeLength: [10, 50]\n"
+        + "                    },\n"
+        + "                    draggable: true,\n"
+        + "                    itemStyle: {\n"
+        + "                        normal: {\n"
+        + "                            color: '#4b565b'\n"
+        + "                        }\n"
+        + "                    },\n"
+        + "                    lineStyle: {\n"
+        + "                        normal: {\n"
+        + "                            width: 2,\n"
+        + "                            color: '#4b565b'\n"
+        + "\n"
+        + "                        }\n"
+        + "                    },\n"
+        + "                    edgeLabel: {\n"
+        + "                        normal: {\n"
+        + "                            show: true,\n"
+        + "                            formatter: function (x) {\n"
+        + "                                return x.data.name;\n"
+        + "                            }\n"
+        + "                        }\n"
+        + "                    },\n"
+        + "                    label: {\n"
+        + "                        normal: {\n"
+        + "                            show: true,\n"
+        + "                            textStyle: {\n"
+        + "                            }\n"
+        + "                        }\n"
+        + "                    },\n"
+        + "                    data: %s\n"
+        + ",\n"
+        + "                    links: %s\n"
+        + "\n"
+        + "\n"
+        + "                }\n"
+        + "            ]\n"
+        + "        };\n"
+        + "        myChart.setOption(option);\n"
+        + "    </script>\n"
+        + "</body>\n"
+        + "</html>\n";
 
 }
