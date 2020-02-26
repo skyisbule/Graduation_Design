@@ -14,7 +14,7 @@ import example.po.User;
  */
 public class BathInsertExample {
 
-    public static void main(String[] args) throws IllegalAccessException, InstantiationException {
+    public static void main(String[] args) {
         //创建db实例
         SkyDB skyDB = SkyDB.getInstance();
         skyDB.dropIfExit(User.class, "1.0");

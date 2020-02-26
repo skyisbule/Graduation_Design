@@ -57,7 +57,7 @@ import example.po.Paper;
  */
 public class PaperAnalysisExample {
 
-    private static void buildData(DataObject dataObject) throws IllegalAccessException {
+    private static void buildData(DataObject dataObject) {
 
         int insertNum = 10000;
 
