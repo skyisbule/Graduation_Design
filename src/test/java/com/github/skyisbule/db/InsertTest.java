@@ -1,6 +1,5 @@
 package com.github.skyisbule.db;
 
-import com.github.skyisbule.db.center.ConfigCenter;
 import com.github.skyisbule.db.center.InstanceManager;
 import com.github.skyisbule.db.common.ColumnTypeEnum;
 import com.github.skyisbule.db.enty.Db;
