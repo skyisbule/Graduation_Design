@@ -13,22 +13,24 @@ public class ConfigCenter {
 
     private static Map<String, Db> dbInfo = new HashMap<>();
 
-    public static Db getDbByName(String name){
+    public static Db getDbByName(String name) {
         return dbInfo.get(name);
     }
 
     public static void getFromDisk() throws IOException {
-        String path  = DefaultConfig.BASE_WORK_PATH;
-        File target  = new File(path);
+        String path = DefaultConfig.BASE_WORK_PATH;
+        File target = new File(path);
         File[] files = target.listFiles();
-        if (files == null) return;
+        if (files == null) {
+            return;
+        }
         for (File file : files) {
             String fileName = file.getName();
             String suffix = fileName.substring(fileName.lastIndexOf('.') + 1);
-            if (file.isFile() && suffix.equals("config") ) {
-                String json = new RandomAccessFile(file.getPath(),"rw").readLine();
-                Db     db   = JsonUtil.fromJson(json,Db.class);
-                dbInfo.put(db.getDbName(),db);
+            if (file.isFile() && suffix.equals("config")) {
+                String json = new RandomAccessFile(file.getPath(), "rw").readLine();
+                Db db = JsonUtil.fromJson(json, Db.class);
+                dbInfo.put(db.getDbName(), db);
             }
         }
     }
@@ -37,22 +39,22 @@ public class ConfigCenter {
         Db db = new Db();
         db.setDbName(dbName);
         String path = DefaultConfig.BASE_WORK_PATH;
-        File file   = new File(path+dbName+".config");
-        if (file.createNewFile()){
+        File file = new File(path + dbName + ".config");
+        if (file.createNewFile()) {
             String json = JsonUtil.getJson(db);
-            RandomAccessFile writer = new RandomAccessFile(file,"rw");
+            RandomAccessFile writer = new RandomAccessFile(file, "rw");
             writer.writeBytes(json);
-            dbInfo.put(dbName,db);
-        }else{
+            dbInfo.put(dbName, db);
+        } else {
             System.out.println("create db file error check system settings or user");
         }
     }
 
     public static void createTable(String dbName, Table table) throws IOException {
         Db db = dbInfo.get(dbName);
-        db.getTables().put(table.tableName,table);
+        db.getTables().put(table.tableName, table);
         String json = JsonUtil.getJson(db);
-        RandomAccessFile writer = new RandomAccessFile(DefaultConfig.BASE_WORK_PATH + dbName +".config","rw");
+        RandomAccessFile writer = new RandomAccessFile(DefaultConfig.BASE_WORK_PATH + dbName + ".config", "rw");
         writer.writeBytes(json);
     }
 
@@ -60,9 +62,9 @@ public class ConfigCenter {
         try {
             Db db = dbInfo.get(dbName);
             String json = JsonUtil.getJson(db);
-            RandomAccessFile writer = new RandomAccessFile(DefaultConfig.BASE_WORK_PATH + dbName +".config","rw");
+            RandomAccessFile writer = new RandomAccessFile(DefaultConfig.BASE_WORK_PATH + dbName + ".config", "rw");
             writer.writeBytes(json);
-        }catch (IOException e){
+        } catch (IOException e) {
             e.printStackTrace();
             System.out.println("flush db info error");
         }

@@ -19,9 +19,9 @@ public class Engine {
 
     private IOCenter ioCenter = (IOCenter)InstanceManager.getInstance("IOCenter");
 
-    public boolean doCreateTable(String dbName,String tableName){
+    public boolean doCreateTable(String dbName, String tableName) {
         try {
-            ioCenter.createEmptyTable(dbName,tableName);
+            ioCenter.createEmptyTable(dbName, tableName);
         } catch (IOException e) {
             e.printStackTrace();
             return false;
@@ -29,32 +29,32 @@ public class Engine {
         return true;
     }
 
-    public boolean batchInsert(String dbName, String tableName, LinkedList<List<String>> records, int pageNum){
-        Db    db    = ConfigCenter.getDbByName(dbName);
+    public boolean batchInsert(String dbName, String tableName, LinkedList<List<String>> records, int pageNum) {
+        Db db = ConfigCenter.getDbByName(dbName);
         Table table = db.getTableByName(tableName);
 
         List<ColumnTypeEnum> types = table.getTypes();
-        Page page        = ioCenter.getPage(dbName,tableName,pageNum);
+        Page page = ioCenter.getPage(dbName, tableName, pageNum);
         byte[] pageBytes = page.getData();
-        int pageEndPos   = page.getPageEndPos();
+        int pageEndPos = page.getPageEndPos();
 
         table.setRecordNum(table.getRecordNum() + records.size());
         List<Page> pageList = new ArrayList<>();
 
         for (List<String> columns : records) {
 
-            byte[] data = record2bytes(columns,types);
+            byte[] data = record2bytes(columns, types);
             //代表没写满  那就不io接着往后写
-            if (pageEndPos + data.length < 1024*16){
-                pageBytes = ByteUtil.write(pageBytes,data,pageEndPos);
+            if (pageEndPos + data.length < 1024 * 16) {
+                pageBytes = ByteUtil.write(pageBytes, data, pageEndPos);
                 pageEndPos += data.length;
                 page.increaseMaxId();
                 page.setData(pageBytes);
-            }else{
+            } else {
                 //写满了  那就更新信息写入io
-                pageBytes = ByteUtil.updateMinId(pageBytes,page.getMinId());
-                pageBytes = ByteUtil.updateMaxId(pageBytes,page.getMaxId());
-                pageBytes = ByteUtil.updateEndPos(pageBytes,pageEndPos);
+                pageBytes = ByteUtil.updateMinId(pageBytes, page.getMinId());
+                pageBytes = ByteUtil.updateMaxId(pageBytes, page.getMaxId());
+                pageBytes = ByteUtil.updateEndPos(pageBytes, pageEndPos);
                 page.setPageEndPos(pageEndPos);
                 page.setData(pageBytes);
                 ConfigCenter.flushConfig(dbName);
@@ -67,7 +67,7 @@ public class Engine {
                 newPage.setMinId(page.maxId + 1);
                 newPage.setMaxId(page.maxId + 1);
                 newPage.setPageEndPos(16 + data.length);
-                byte[] newData = getEmptyPage(page.pageNum+1,page.minId+1,data);
+                byte[] newData = getEmptyPage(page.pageNum + 1, page.minId + 1, data);
                 pageEndPos = newPage.getPageEndPos();
                 pageBytes = newData;
                 newPage.setData(newData);
@@ -76,94 +76,96 @@ public class Engine {
 
         }
 
-        pageBytes = ByteUtil.updateMinId(pageBytes,page.getMinId());
-        pageBytes = ByteUtil.updateMaxId(pageBytes,page.getMaxId());
-        pageBytes = ByteUtil.updateEndPos(pageBytes,pageEndPos);
+        pageBytes = ByteUtil.updateMinId(pageBytes, page.getMinId());
+        pageBytes = ByteUtil.updateMaxId(pageBytes, page.getMaxId());
+        pageBytes = ByteUtil.updateEndPos(pageBytes, pageEndPos);
         page.setData(pageBytes);
 
         pageList.add(page);
-        ioCenter.writePages(dbName,tableName,pageList);
+        ioCenter.writePages(dbName, tableName, pageList);
         ConfigCenter.flushConfig(dbName);
 
         return true;
     }
 
-    private byte[] record2bytes(List<String> columns,List<ColumnTypeEnum> types){
+    private byte[] record2bytes(List<String> columns, List<ColumnTypeEnum> types) {
         //开始构建字节序列
         byte[] data = new byte[0];
         for (int i = 0; i < types.size(); i++) {
-            switch (types.get(i)){
+            switch (types.get(i)) {
                 case TIME://跟INT处理方式一样
                 case INT://直接往后续   int类型末尾不需要终止位  因为我们知道它一定是4个字节
                     byte[] num;
-                    if (columns.get(i) == null)
-                        num    = ByteUtil.getDataNull();
-                    else
-                        num    = ByteUtil.int2byte(Integer.parseInt(columns.get(i)));
-                    data       = ByteUtil.byteMerger(data,num);
+                    if (columns.get(i) == null) {
+                        num = ByteUtil.getDataNull();
+                    } else {
+                        num = ByteUtil.int2byte(Integer.parseInt(columns.get(i)));
+                    }
+                    data = ByteUtil.byteMerger(data, num);
                     break;
                 case STRING:
                     byte[] strBytes;
                     String str = columns.get(i);
-                    if (str == null)
+                    if (str == null) {
                         strBytes = ByteUtil.getDataNull();
-                    else
+                    } else {
                         strBytes = str.getBytes();
-                    data = ByteUtil.byteMerger(data,strBytes);
+                    }
+                    data = ByteUtil.byteMerger(data, strBytes);
                     byte[] columnEnd = ByteUtil.getColumnEnd();
-                    data = ByteUtil.byteMerger(data,columnEnd);
+                    data = ByteUtil.byteMerger(data, columnEnd);
                     break;
             }
         }
         //拼接一下这条数据有没有被删除
-        data    = ByteUtil.byteMerger(data,ByteUtil.int2byte(DefaultConfig.ALIVE_FLAG));
+        data = ByteUtil.byteMerger(data, ByteUtil.int2byte(DefaultConfig.ALIVE_FLAG));
         return data;
     }
 
-    public boolean doInsert(String dbName,String tableName,List<String> columns,int pageNum){
-        Db    db    = ConfigCenter.getDbByName(dbName);
+    public boolean doInsert(String dbName, String tableName, List<String> columns, int pageNum) {
+        Db db = ConfigCenter.getDbByName(dbName);
         Table table = db.getTableByName(tableName);
 
-        Page page   = ioCenter.getPage(dbName,tableName,pageNum);
+        Page page = ioCenter.getPage(dbName, tableName, pageNum);
         List<ColumnTypeEnum> types = table.getTypes();
         //开始构建字节序列
         byte[] data = null;
-        data = record2bytes(columns,types);
+        data = record2bytes(columns, types);
         //接下来要把数据写入page数组
         int len = data.length;
         //构建完成  此时data  已经为记录数据+换行符的格式了
         //接下来要判断当前页表能否有足够空间供我们插入数据  如果没有的话需要新建页表
-        byte[] source  = page.data;
+        byte[] source = page.data;
         int pageEndPos = page.getPageEndPos();
-        if (pageEndPos + len < (1024*16)){ //代表此时不需要分页,直接在页末添加数据
-            int    newMaxPos     = pageEndPos + len;               //0
-            byte[] endPosHeader  = ByteUtil.int2byte(newMaxPos);  //1
-            int    newRecordId   = page.maxId + 1;
-            source = ByteUtil.write(source,ByteUtil.int2byte(newRecordId),8);
-            source = ByteUtil.write(source,endPosHeader,12); //2 这3行更新header头信息 maxPos 和 maxId
-            page.setData(ByteUtil.write(source,data,pageEndPos));//数据写入source
-        }else{
+        if (pageEndPos + len < (1024 * 16)) { //代表此时不需要分页,直接在页末添加数据
+            int newMaxPos = pageEndPos + len;               //0
+            byte[] endPosHeader = ByteUtil.int2byte(newMaxPos);  //1
+            int newRecordId = page.maxId + 1;
+            source = ByteUtil.write(source, ByteUtil.int2byte(newRecordId), 8);
+            source = ByteUtil.write(source, endPosHeader, 12); //2 这3行更新header头信息 maxPos 和 maxId
+            page.setData(ByteUtil.write(source, data, pageEndPos));//数据写入source
+        } else {
             table.setPageNum(pageNum + 1);//更新一下页号
             Page newPage = new Page();
             newPage.setPageNum(page.getPageNum() + 1);
             newPage.setMinId(page.maxId + 1);
             newPage.setMaxId(page.maxId + 1);
             newPage.setPageEndPos(16 + len);
-            byte[] newData = getEmptyPage(page.pageNum+1,page.minId+1,data);
+            byte[] newData = getEmptyPage(page.pageNum + 1, page.minId + 1, data);
             newPage.setData(newData);
             page = newPage;
         }
         //更新记录
-        table.setRecordNum(table.getRecordNum() + 1 );
+        table.setRecordNum(table.getRecordNum() + 1);
         ConfigCenter.flushConfig(dbName);
-        return ioCenter.writePage(dbName,tableName,page);
+        return ioCenter.writePage(dbName, tableName, page);
     }
 
-    public LinkedList<ArrayList<String>> doReadPage(String dbName,String tableName,int pageNum){
-        Db    db    = ConfigCenter.getDbByName(dbName);
+    public LinkedList<ArrayList<String>> doReadPage(String dbName, String tableName, int pageNum) {
+        Db db = ConfigCenter.getDbByName(dbName);
         Table table = db.getTableByName(tableName);
 
-        Page   page = ioCenter.getPage(dbName,tableName,pageNum);
+        Page page = ioCenter.getPage(dbName, tableName, pageNum);
         byte[] data = page.getData();
         LinkedList<ArrayList<String>> result = new LinkedList<>();
         int begin = 16;
@@ -202,28 +204,28 @@ public class Engine {
         return result;
     }
 
-    public List<String> getDBs(){
+    public List<String> getDBs() {
         return ioCenter.getDBs();
     }
 
-    public boolean drop(String db){
+    public boolean drop(String db) {
         return ioCenter.drop(db);
     }
 
-    private byte[] getEmptyPage(int pageId,int indexId,byte[] data){
+    private byte[] getEmptyPage(int pageId, int indexId, byte[] data) {
         byte[] pageIdBytes = ByteUtil.int2byte(pageId);
         byte[] pageIndexId = ByteUtil.int2byte(indexId);
-        byte[] pageEndPos  = ByteUtil.int2byte(data.length + 16);
-        byte[] header      = new byte[0];
-        header = ByteUtil.byteMerger(header,pageIdBytes);
-        header = ByteUtil.byteMerger(header,pageIndexId);
-        header = ByteUtil.byteMerger(header,pageIndexId);
-        header = ByteUtil.byteMerger(header,pageEndPos);
+        byte[] pageEndPos = ByteUtil.int2byte(data.length + 16);
+        byte[] header = new byte[0];
+        header = ByteUtil.byteMerger(header, pageIdBytes);
+        header = ByteUtil.byteMerger(header, pageIndexId);
+        header = ByteUtil.byteMerger(header, pageIndexId);
+        header = ByteUtil.byteMerger(header, pageEndPos);
         //build header end   =>>>>   start build record
         byte[] result = new byte[0];
-        result = ByteUtil.byteMerger(result,header);
-        result = ByteUtil.byteMerger(result,data);
-        result = ByteUtil.byteMerger(result,new byte[1024 * 16 - result.length]);
+        result = ByteUtil.byteMerger(result, header);
+        result = ByteUtil.byteMerger(result, data);
+        result = ByteUtil.byteMerger(result, new byte[1024 * 16 - result.length]);
         return result;
     }
 
