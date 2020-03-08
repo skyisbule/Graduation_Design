@@ -40,6 +40,18 @@ public class SkyDB {
         return skyDB;
     }
 
+    public static SkyDB getInstance(String workPath) {
+        DefaultConfig.BASE_WORK_PATH = workPath;
+        if (skyDB == null) {
+            synchronized (SkyDB.class) {
+                if (skyDB == null) {
+                    skyDB = new SkyDB();
+                }
+            }
+        }
+        return skyDB;
+    }
+
     public SkyDB() {
         System.out.println("[skyDB info] welcome to skyDB version:" + VERSION);
         System.out.println("[skyDB info] db starting...");

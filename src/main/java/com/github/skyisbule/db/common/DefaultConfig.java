@@ -1,16 +1,16 @@
 package com.github.skyisbule.db.common;
 
-public interface DefaultConfig {
+public class DefaultConfig {
 
-    byte COLUMN_END_FLAG  = 3;
-    byte ALIVE_FLAG       = 6;
-    byte DATA_NULL_FLAG   = 0;
+    public static byte COLUMN_END_FLAG  = 3;
+    public static byte ALIVE_FLAG       = 6;
+    public static byte DATA_NULL_FLAG   = 0;
 
     //从文件中读取数据，默认攒到五万就刷盘
-    Integer FLUSH_DISK_FLAG_NUM = 50000;
+    public static Integer FLUSH_DISK_FLAG_NUM = 50000;
 
-    String BASE_WORK_PATH   = "/Users/mac/Desktop/";
+    public static String BASE_WORK_PATH   = "/Users/mac/Desktop/";
 
-    Integer COLUMN_MAX_LENGTH = 50;
+    public static Integer COLUMN_MAX_LENGTH = 50;
 
 }

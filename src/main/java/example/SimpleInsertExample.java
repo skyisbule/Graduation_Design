@@ -16,9 +16,10 @@ public class SimpleInsertExample {
 
     public static void main(String[] args) {
         //创建SkyDB入口
-        SkyDB db = SkyDB.getInstance();
+        SkyDB db = SkyDB.getInstance("/users/hqt/Desktop/");
         //创建一个数据集，指定版本为1.0
-        DataObject dataObject = db.create(User.class, "1.0");
+        db.dropIfExit(User.class, "1.0");
+        DataObject dataObject = db.getOrCreate(User.class, "1.0");
 
         //演示一下逐个插入
         for (int i = 0; i < 10; i++) {
