@@ -21,11 +21,13 @@ import example.po.Paper;
  */
 public class PaperSearchExample {
 
+    private static final String workPath = "/users/hqt/Desktop/";
+
     private static DataObject dataObject;
     private static Index index;
 
     public static void main(String[] args) {
-        SkyDB skyDB = SkyDB.getInstance();
+        SkyDB skyDB = SkyDB.getInstance(workPath);
         dataObject = skyDB.getOrCreate(Paper.class, "1.1");
         index = IndexManager.getIndex(dataObject);
 

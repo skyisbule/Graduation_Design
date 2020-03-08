@@ -14,9 +14,11 @@ import example.po.User;
  */
 public class BathInsertExample {
 
+    private static final String workPath = "/users/hqt/Desktop/";
+
     public static void main(String[] args) {
         //创建db实例
-        SkyDB skyDB = SkyDB.getInstance();
+        SkyDB skyDB = SkyDB.getInstance(workPath);
         skyDB.dropIfExit(User.class, "1.0");
         //由于 simpleInsertExample中已经创建了这个数据集 所以这里直接get即可
         //如果你把数据文件删除了 或执行了drop 则在这里你需要使用create

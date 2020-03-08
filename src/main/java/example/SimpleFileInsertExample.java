@@ -12,9 +12,11 @@ import example.po.User;
  */
 public class SimpleFileInsertExample {
 
+    private static final String workPath = "/users/hqt/Desktop/";
+
     public static void main(String[] args) {
         //创建SkyDB入口
-        SkyDB db = SkyDB.getInstance();
+        SkyDB db = SkyDB.getInstance(workPath);
         //创建一个数据集，指定版本为1.1，不和1.0冲突
         DataObject dataObject = db.create(User.class, "1.1");
         //指定文件，并使用默认的解析器

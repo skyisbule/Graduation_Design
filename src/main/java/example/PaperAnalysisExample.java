@@ -57,6 +57,8 @@ import example.po.Paper;
  */
 public class PaperAnalysisExample {
 
+    private static final String workPath = "/users/hqt/Desktop/";
+
     private static void buildData(DataObject dataObject) {
 
         int insertNum = 10000;
@@ -118,14 +120,13 @@ public class PaperAnalysisExample {
     }
 
     public static void main(String[] args) throws IllegalAccessException, InstantiationException {
-        SkyDB skyDB = SkyDB.getInstance();
+        SkyDB skyDB = SkyDB.getInstance(workPath);
         DataObject dataObject = skyDB.getOrCreate(Paper.class, "1.0");
         buildSourceData(dataObject);
 
         List<Object> data = dataObject.getPage(1);
 
         ConsoleUtil.show(data);
-
 
         DataObject mergedObject = skyDB.create(Paper.class, "1.1");
 

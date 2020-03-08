@@ -13,9 +13,11 @@ import example.po.User;
  */
 public class SimpleComputeExample {
 
+    private static final String workPath = "/users/hqt/Desktop/";
+
     public static void main(String[] args) throws IllegalAccessException, InstantiationException {
         //创建SkyDB入口
-        SkyDB db = SkyDB.getInstance();
+        SkyDB db = SkyDB.getInstance(workPath);
         //创建一个数据集，指定版本为1.0
         DataObject dataObject = db.getOrCreate(User.class, "1.0");
 
