@@ -107,11 +107,6 @@ public class IOCenter {
         return page;
     }
 
-    public List<Page> getPages(String db, String table, int pageBegin, int pageEnd) {
-
-        return null;
-    }
-
     public List<String> getDBs() {
         List<String> dbs = new ArrayList<>();
         File folder = new File(DefaultConfig.BASE_WORK_PATH);

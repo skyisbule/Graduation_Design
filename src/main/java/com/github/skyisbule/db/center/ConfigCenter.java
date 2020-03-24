@@ -27,7 +27,7 @@ public class ConfigCenter {
         for (File file : files) {
             String fileName = file.getName();
             String suffix = fileName.substring(fileName.lastIndexOf('.') + 1);
-            if (file.isFile() && suffix.equals("config")) {
+            if (file.isFile() && "config".equals(suffix)) {
                 String json = new RandomAccessFile(file.getPath(), "rw").readLine();
                 Db db = JsonUtil.fromJson(json, Db.class);
                 dbInfo.put(db.getDbName(), db);

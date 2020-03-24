@@ -121,7 +121,8 @@ public class DataObject {
         System.out.println(JsonUtil.getJson(db));
     }
 
-    public void doCompute(Computer computer) throws InstantiationException, IllegalAccessException {
+    @SuppressWarnings("unchecked")
+    public void doCompute(Computer computer) {
         int pageNum = table.pageNum;
 
         computer.init(context);

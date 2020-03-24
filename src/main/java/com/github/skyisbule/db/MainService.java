@@ -132,22 +132,6 @@ public class MainService {
         return result;
     }
 
-    void group() {
-
-    }
-
-    void DeDuplication(String column) {
-
-    }
-
-    void top() {
-
-    }
-
-    void save() {
-
-    }
-
     List<String> getDBs() {
         return engine.getDBs();
     }

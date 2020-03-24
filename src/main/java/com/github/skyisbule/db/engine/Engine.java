@@ -58,7 +58,6 @@ public class Engine {
                 page.setPageEndPos(pageEndPos);
                 page.setData(pageBytes);
                 ConfigCenter.flushConfig(dbName);
-                //ioCenter.writePage(dbName,tableName,page);
                 pageList.add(page);
 
                 table.setPageNum(table.getPageNum() + 1);//更新一下页号
