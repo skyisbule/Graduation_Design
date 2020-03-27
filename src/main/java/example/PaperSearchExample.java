@@ -26,6 +26,9 @@ public class PaperSearchExample {
     private static DataObject dataObject;
     private static Index index;
 
+    private static final int SOURCE_ID = 1;
+    private static final int HIERARCHY = 3;
+
     public static void main(String[] args) {
         SkyDB skyDB = SkyDB.getInstance(workPath);
         dataObject = skyDB.getOrCreate(Paper.class, "1.1");
@@ -33,20 +36,21 @@ public class PaperSearchExample {
 
         //开始进行迭代查找
         PaperSearchExample e = new PaperSearchExample();
-        List<Node> nodes = e.buildGridData(1, 3);
-        String html = e.buildHTML(nodes, 2);
-        IOUtil.forceWriteFile("/Users/hqt/Downloads/ECharts-Relationship-map-master/" + Paper.class.getName() + ".html",html);
+        List<Node> nodes = e.buildGridData();
+        String html = e.buildHTML(nodes);
+        IOUtil.forceWriteFile("/Users/hqt/Downloads/ECharts-Relationship-map-master/" + Paper.class.getName() + ".html",
+            html);
     }
 
     //待分析的起始论文id,查询的层数
-    private List<Node> buildGridData(int sourceId, int hierarchy) {
+    private List<Node> buildGridData() {
         List<Node> nodeList = new ArrayList<>();
-        Node source = buildNode(Objects.requireNonNull(searchById(sourceId)));
+        Node source = buildNode(Objects.requireNonNull(searchById(PaperSearchExample.SOURCE_ID)));
         source.setHierarchy(0);
         nodeList.add(source);
         List<Node> temp;
 
-        for (int nowHierarchy = 0; nowHierarchy < hierarchy; nowHierarchy++) {
+        for (int nowHierarchy = 0; nowHierarchy < PaperSearchExample.HIERARCHY; nowHierarchy++) {
             temp = new ArrayList<>();
             for (Node node : nodeList) {
                 if (node.getHierarchy() == nowHierarchy) {
@@ -88,18 +92,16 @@ public class PaperSearchExample {
         return null;
     }
 
-    private String buildHTML(List<Node> nodeList, int hierarchy) {
+    private String buildHTML(List<Node> nodeList) {
         List<HtmlNode> htmlNodes = new ArrayList<>();
         List<HtmlLink> links = new ArrayList<>();
         Set<Integer> set = new HashSet<>();
         for (Node node : nodeList) {
-            if (node.getHierarchy() == hierarchy) {
+            if (node.getHierarchy() == HIERARCHY - 1) {
                 break;
             }
             set.add(node.getId());
-            for (Integer refId : node.getRefIds()) {
-                set.add(refId);
-            }
+            set.addAll(node.getRefIds());
         }
         for (Integer id : set) {
             HtmlNode htmlNode = new HtmlNode();
@@ -108,7 +110,7 @@ public class PaperSearchExample {
         }
 
         for (Node node : nodeList) {
-            if (node.getHierarchy() == hierarchy) {
+            if (node.getHierarchy() == HIERARCHY - 1) {
                 break;
             }
 
@@ -123,101 +125,98 @@ public class PaperSearchExample {
         System.out.println("--------------------------");
         System.out.println(JsonUtil.getJson(links));
 
-        String html = htmlHead + String.format(htmlTemplate, JsonUtil.getJson(htmlNodes), JsonUtil.getJson(links));
-        return html;
+        String htmlHead = "<!DOCTYPE html>\n"
+            + "<html>\n"
+            + "<head>\n"
+            + "    <meta name=\"viewport\" content=\"width=device-width\" />\n"
+            + "    <title>关系图谱</title>\n"
+            + "    <script src=\"jquery-1.10.2.min.js\"></script>\n"
+            + "    <script src=\"echarts.min.js\"></script>\n"
+            + "    <style type=\"text/css\">\n"
+            + "        html, body, #main { height: 100%; width: 100%; margin: 0; padding: 0 }\n"
+            + "    </style>\n"
+            + "</head>";
+        String htmlTemplate = "<!DOCTYPE html>\n"
+            + "<body>\n"
+            + "    <div id=\"main\" style=\"\"></div>\n"
+            + "    <script type=\"text/javascript\">\n"
+            + "        var myChart = echarts.init(document.getElementById('main'));\n"
+            + "        option = {\n"
+            + "            title: { text: '论文关系图谱' },\n"
+            + "            tooltip: {\n"
+            + "                formatter: function (x) {\n"
+            + "                    return x.data.des;\n"
+            + "                }\n"
+            + "            },\n"
+            + "            series: [\n"
+            + "                {\n"
+            + "                    type: 'graph',\n"
+            + "                    layout: 'force',\n"
+            + "                    symbolSize: 80,\n"
+            + "                    roam: true,\n"
+            + "                    edgeSymbol: ['circle', 'arrow'],\n"
+            + "                    edgeSymbolSize: [4, 10],\n"
+            + "                    edgeLabel: {\n"
+            + "                        normal: {\n"
+            + "                            textStyle: {\n"
+            + "                                fontSize: 20\n"
+            + "                            }\n"
+            + "                        }\n"
+            + "                    },\n"
+            + "                    force: {\n"
+            + "                        repulsion: 2500,\n"
+            + "                        edgeLength: [10, 50]\n"
+            + "                    },\n"
+            + "                    draggable: true,\n"
+            + "                    itemStyle: {\n"
+            + "                        normal: {\n"
+            + "                            color: '#4b565b'\n"
+            + "                        }\n"
+            + "                    },\n"
+            + "                    lineStyle: {\n"
+            + "                        normal: {\n"
+            + "                            width: 2,\n"
+            + "                            color: '#4b565b'\n"
+            + "\n"
+            + "                        }\n"
+            + "                    },\n"
+            + "                    edgeLabel: {\n"
+            + "                        normal: {\n"
+            + "                            show: true,\n"
+            + "                            formatter: function (x) {\n"
+            + "                                return x.data.name;\n"
+            + "                            }\n"
+            + "                        }\n"
+            + "                    },\n"
+            + "                    label: {\n"
+            + "                        normal: {\n"
+            + "                            show: true,\n"
+            + "                            textStyle: {\n"
+            + "                            }\n"
+            + "                        }\n"
+            + "                    },\n"
+            + "                    data: %s\n"
+            + ",\n"
+            + "                    links: %s\n"
+            + "\n"
+            + "\n"
+            + "                }\n"
+            + "            ]\n"
+            + "        };\n"
+            + "        myChart.setOption(option);\n"
+            + "    </script>\n"
+            + "</body>\n"
+            + "</html>\n";
+        return htmlHead + String.format(htmlTemplate, JsonUtil.getJson(htmlNodes), JsonUtil.getJson(links));
     }
 
-    private class HtmlNode {
+    private static class HtmlNode {
         public String name;
     }
 
-    private class HtmlLink {
-        public String source;
-        public String target;
+    private static class HtmlLink {
+        String source;
+        String target;
     }
-
-    private static String htmlHead = "<!DOCTYPE html>\n"
-        + "<html>\n"
-        + "<head>\n"
-        + "    <meta name=\"viewport\" content=\"width=device-width\" />\n"
-        + "    <title>关系图谱</title>\n"
-        + "    <script src=\"jquery-1.10.2.min.js\"></script>\n"
-        + "    <script src=\"echarts.min.js\"></script>\n"
-        + "    <style type=\"text/css\">\n"
-        + "        html, body, #main { height: 100%; width: 100%; margin: 0; padding: 0 }\n"
-        + "    </style>\n"
-        + "</head>";
-
-    private static String htmlTemplate = "<!DOCTYPE html>\n"
-        + "<body>\n"
-        + "    <div id=\"main\" style=\"\"></div>\n"
-        + "    <script type=\"text/javascript\">\n"
-        + "        var myChart = echarts.init(document.getElementById('main'));\n"
-        + "        option = {\n"
-        + "            title: { text: '论文关系图谱' },\n"
-        + "            tooltip: {\n"
-        + "                formatter: function (x) {\n"
-        + "                    return x.data.des;\n"
-        + "                }\n"
-        + "            },\n"
-        + "            series: [\n"
-        + "                {\n"
-        + "                    type: 'graph',\n"
-        + "                    layout: 'force',\n"
-        + "                    symbolSize: 80,\n"
-        + "                    roam: true,\n"
-        + "                    edgeSymbol: ['circle', 'arrow'],\n"
-        + "                    edgeSymbolSize: [4, 10],\n"
-        + "                    edgeLabel: {\n"
-        + "                        normal: {\n"
-        + "                            textStyle: {\n"
-        + "                                fontSize: 20\n"
-        + "                            }\n"
-        + "                        }\n"
-        + "                    },\n"
-        + "                    force: {\n"
-        + "                        repulsion: 2500,\n"
-        + "                        edgeLength: [10, 50]\n"
-        + "                    },\n"
-        + "                    draggable: true,\n"
-        + "                    itemStyle: {\n"
-        + "                        normal: {\n"
-        + "                            color: '#4b565b'\n"
-        + "                        }\n"
-        + "                    },\n"
-        + "                    lineStyle: {\n"
-        + "                        normal: {\n"
-        + "                            width: 2,\n"
-        + "                            color: '#4b565b'\n"
-        + "\n"
-        + "                        }\n"
-        + "                    },\n"
-        + "                    edgeLabel: {\n"
-        + "                        normal: {\n"
-        + "                            show: true,\n"
-        + "                            formatter: function (x) {\n"
-        + "                                return x.data.name;\n"
-        + "                            }\n"
-        + "                        }\n"
-        + "                    },\n"
-        + "                    label: {\n"
-        + "                        normal: {\n"
-        + "                            show: true,\n"
-        + "                            textStyle: {\n"
-        + "                            }\n"
-        + "                        }\n"
-        + "                    },\n"
-        + "                    data: %s\n"
-        + ",\n"
-        + "                    links: %s\n"
-        + "\n"
-        + "\n"
-        + "                }\n"
-        + "            ]\n"
-        + "        };\n"
-        + "        myChart.setOption(option);\n"
-        + "    </script>\n"
-        + "</body>\n"
-        + "</html>\n";
 
 }

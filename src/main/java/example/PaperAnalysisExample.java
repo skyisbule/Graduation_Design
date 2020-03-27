@@ -119,7 +119,7 @@ public class PaperAnalysisExample {
 
     }
 
-    public static void main(String[] args) throws IllegalAccessException, InstantiationException {
+    public static void main(String[] args) {
         SkyDB skyDB = SkyDB.getInstance(workPath);
         DataObject dataObject = skyDB.getOrCreate(Paper.class, "1.0");
         buildSourceData(dataObject);
