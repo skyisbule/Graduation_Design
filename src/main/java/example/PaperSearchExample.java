@@ -182,7 +182,7 @@ public class PaperSearchExample {
             + "                    },\n"
             + "                    edgeLabel: {\n"
             + "                        normal: {\n"
-            + "                            show: true,\n"
+            + "                            show: false,\n"
             + "                            formatter: function (x) {\n"
             + "                                return x.data.name;\n"
             + "                            }\n"

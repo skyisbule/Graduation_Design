@@ -16,6 +16,9 @@ public class BathInsertExample {
 
     private static final String workPath = "/users/hqt/Desktop/db/";
 
+    //默认插入5万条数据
+    private static final int INSERT_NUMBER = 50_000;
+
     public static void main(String[] args) {
         //创建db实例
         SkyDB skyDB = SkyDB.getInstance(workPath);
@@ -26,7 +29,7 @@ public class BathInsertExample {
 
         //准备数据
         List<Object> data = new LinkedList<>();
-        for (int i = 0; i < 10000; i++) {
+        for (int i = 0; i < INSERT_NUMBER; i++) {
             User user = new User(i, "sky", 18 + i);
             data.add(user);
         }
@@ -35,7 +38,7 @@ public class BathInsertExample {
         dataObject.bathInsert(data);
         long endTime = System.currentTimeMillis();
         //看一下插入所花费的时间
-        System.out.println("插入10000条数据总共花费：" + (endTime - beginTime) + "ms");
+        System.out.println("插入" + INSERT_NUMBER + "条数据总共花费：" + (endTime - beginTime) + "ms");
         //打印一下此时的数据集信息
         dataObject.showInfo();
 
