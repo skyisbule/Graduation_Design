@@ -12,7 +12,7 @@ import example.po.User;
  */
 public class SimpleFileInsertExample {
 
-    private static final String workPath = "/users/hqt/Desktop/";
+    private static final String workPath = "/users/hqt/Desktop/db/";
 
     public static void main(String[] args) {
         //创建SkyDB入口

@@ -57,7 +57,7 @@ import example.po.Paper;
  */
 public class PaperAnalysisExample {
 
-    private static final String workPath = "/users/hqt/Desktop/";
+    private static final String workPath = "/users/hqt/Desktop/db/";
 
     private static void buildData(DataObject dataObject) {
 

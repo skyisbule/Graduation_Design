@@ -13,9 +13,9 @@ import example.po.User;
  */
 public class SimpleComputeExample {
 
-    private static final String workPath = "/users/hqt/Desktop/";
+    private static final String workPath = "/users/hqt/Desktop/db/";
 
-    public static void main(String[] args) throws IllegalAccessException, InstantiationException {
+    public static void main(String[] args) {
         //创建SkyDB入口
         SkyDB db = SkyDB.getInstance(workPath);
         //创建一个数据集，指定版本为1.0
@@ -32,7 +32,7 @@ public class SimpleComputeExample {
             public void doCompute(User user, ComputeContext context) {
                 System.out.println("db里的每一条数据都会被传进这个函数，这里是你处理数据的最核心的方法");
                 //这里只是简单演示一下计算
-                if (user.age % 2 == 0){
+                if (user.age % 2 == 0) {
                     //把它扔到上下文中
                     context.getResultList().add(user);
                 }
