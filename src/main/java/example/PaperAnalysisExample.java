@@ -57,7 +57,7 @@ import example.po.Paper;
  */
 public class PaperAnalysisExample {
 
-    private static final String workPath = "/users/hqt/Desktop/db/";
+    private static final String workPath = "/users/hqt/Desktop/db/paper/";
 
     private static void buildData(DataObject dataObject) {
 
@@ -103,7 +103,7 @@ public class PaperAnalysisExample {
             for (int loop = 0; loop < refsNum; loop++) {
                 Paper paper = new Paper();
                 paper.setId(i);
-                paper.setRefs(String.valueOf(random.nextInt(400) + 1));
+                paper.setRefs(String.valueOf(random.nextInt(180) + 1));
                 insertList.add(paper);
                 if (insertList.size() > 10000) {
                     dataObject.bathInsert(insertList);
@@ -126,9 +126,9 @@ public class PaperAnalysisExample {
 
         List<Object> data = dataObject.getPage(1);
 
-        ConsoleUtil.show(data);
+        //ConsoleUtil.show(data);
 
-        DataObject mergedObject = skyDB.create(Paper.class, "1.1");
+        DataObject mergedObject = skyDB.getOrCreate(Paper.class, "1.1");
 
         dataObject.doCompute(new Computer<Paper>() {
 
@@ -186,7 +186,7 @@ public class PaperAnalysisExample {
                 newPaper.setId(((Paper)list.get(0)).getId());
                 newPaper.setRefs(refs.toString());
                 mergedList.add(newPaper);
-                if (mergedList.size() > mergedListSize){
+                if (mergedList.size() > mergedListSize) {
                     mergedObject.bathInsert(mergedList);
                     mergedList.clear();
                 }

@@ -1,11 +1,13 @@
 package com.github.skyisbule.db.enty;
 
-import lombok.Data;
-
 import java.util.HashMap;
 import java.util.Map;
 
-@Data
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
 public class Db {
 
     public String dbName;

@@ -143,13 +143,17 @@ public class SkyDB {
         }
         //接下来需要删除真实的文件
 
-        File dataFile = new File(targetFile + ".db");
-        if (!dataFile.delete()) {
-            System.err.println("[skyDB error]delete data file error:" + targetFile);
+        File dataFile = new File(targetFile + "_" + version + ".db");
+        if (dataFile.exists()) {
+            if (!dataFile.delete()) {
+                System.err.println("[skyDB error]delete data file error:" + targetFile);
+            }
         }
-        File indexFile = new File(targetFile + ".index");
-        if (!indexFile.delete()) {
-            System.err.println("[skyDB error]delete index file error:" + targetFile);
+        File indexFile = new File(targetFile + "_" + version + ".index");
+        if (indexFile.exists()) {
+            if (!indexFile.delete()) {
+                System.err.println("[skyDB error]delete index file error:" + targetFile);
+            }
         }
     }
 

@@ -21,7 +21,7 @@ import example.po.Paper;
  */
 public class PaperSearchExample {
 
-    private static final String workPath = "/users/hqt/Desktop/db/";
+    private static final String workPath = "/users/hqt/Desktop/db/paper/";
 
     private static DataObject dataObject;
     private static Index index;
