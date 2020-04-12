@@ -37,8 +37,6 @@ public class BathInsertExample {
         //执行批量插入
         dataObject.bathInsert(data);
         long endTime = System.currentTimeMillis();
-        //看一下插入所花费的时间
-        System.out.println("插入" + INSERT_NUMBER + "条数据总共花费：" + (endTime - beginTime) + "ms");
         //打印一下此时的数据集信息
         dataObject.showInfo();
 
@@ -46,6 +44,9 @@ public class BathInsertExample {
         List<Object> objects = dataObject.getPage(1);
         //你也可以用内置的util来打印出漂亮的表格，更方便查看。
         ConsoleUtil.show(objects);
+
+        //看一下插入所花费的时间
+        System.out.println("插入" + INSERT_NUMBER + "条数据总共花费：" + (endTime - beginTime) + "ms");
 
     }
 

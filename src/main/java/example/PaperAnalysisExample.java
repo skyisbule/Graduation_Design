@@ -57,7 +57,7 @@ import example.po.Paper;
  */
 public class PaperAnalysisExample {
 
-    private static final String workPath = "/users/hqt/Desktop/db/paper/";
+    private static final String workPath = "/users/hqt/Desktop/db/ ";
 
     private static void buildData(DataObject dataObject) {
 
@@ -121,6 +121,7 @@ public class PaperAnalysisExample {
 
     public static void main(String[] args) {
         SkyDB skyDB = SkyDB.getInstance(workPath);
+        skyDB.dropIfExit(Paper.class, "1.0");
         DataObject dataObject = skyDB.getOrCreate(Paper.class, "1.0");
         buildSourceData(dataObject);
 
@@ -128,6 +129,7 @@ public class PaperAnalysisExample {
 
         //ConsoleUtil.show(data);
 
+        skyDB.dropIfExit(Paper.class, "1.1");
         DataObject mergedObject = skyDB.getOrCreate(Paper.class, "1.1");
 
         dataObject.doCompute(new Computer<Paper>() {

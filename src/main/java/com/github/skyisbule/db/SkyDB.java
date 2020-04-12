@@ -130,11 +130,13 @@ public class SkyDB {
         String targetFile = DefaultConfig.BASE_WORK_PATH + dbName + "_" + version;
         //只有一张表的情况下直接删库
         if (dbInfo.get(dbName).tables.size() == 1) {
-            dbInfo.remove(dbName);
-            File dbFile = new File(DefaultConfig.BASE_WORK_PATH + dbName + ".config");
-            //dbFile.
-            if (!dbFile.delete()) {
-                System.err.println("[skyDB error]delete db file error:" + targetFile);
+            Table table = dbInfo.get(dbName).tables.get(version);
+            if (table != null) {
+                dbInfo.remove(dbName);
+                File dbFile = new File(DefaultConfig.BASE_WORK_PATH + dbName + ".config");
+                if (!dbFile.delete()) {
+                    System.err.println("[skyDB error]delete db file error:" + targetFile);
+                }
             }
         } else {
             //多张表的话 就只能采取保留策略
@@ -143,13 +145,13 @@ public class SkyDB {
         }
         //接下来需要删除真实的文件
 
-        File dataFile = new File(targetFile + "_" + version + ".db");
+        File dataFile = new File(targetFile + ".db");
         if (dataFile.exists()) {
             if (!dataFile.delete()) {
                 System.err.println("[skyDB error]delete data file error:" + targetFile);
             }
         }
-        File indexFile = new File(targetFile + "_" + version + ".index");
+        File indexFile = new File(targetFile + ".index");
         if (indexFile.exists()) {
             if (!indexFile.delete()) {
                 System.err.println("[skyDB error]delete index file error:" + targetFile);
